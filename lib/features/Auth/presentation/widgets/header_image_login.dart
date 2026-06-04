@@ -1,10 +1,7 @@
-
 import 'package:flutter/material.dart';
 
 class HeaderImageLogin extends StatelessWidget {
-  const HeaderImageLogin({
-    super.key,
-  });
+  const HeaderImageLogin({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +22,9 @@ class HeaderImageLogin extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(18),
           child: Image.asset(
-            "/home/h/e_com_user/assets/images/ecom_login_image.jpg",
+            "assets/images/ecom_login_image.jpg",
             width: 210,
-            height: 210,
+            height: 170,
             fit: BoxFit.cover,
           ),
         ),

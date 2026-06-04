@@ -1,4 +1,3 @@
-  
 import 'package:flutter/material.dart';
 
 class AppTextStyles {
@@ -33,9 +32,10 @@ class AppTextStyles {
   );
 
   static const TextStyle headlineSmall = TextStyle(
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: FontWeight.w600,
     letterSpacing: -0.25,
+    color: Color.fromARGB(255, 21, 21, 21),
   );
 
   static const TextStyle titleLarge = TextStyle(
