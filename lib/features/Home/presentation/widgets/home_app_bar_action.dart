@@ -3,17 +3,14 @@ import 'package:flutter/material.dart';
 class HomeAppBarActions extends StatelessWidget {
   final bool isCollapsed;
 
-  const HomeAppBarActions({
-    super.key,
-    required this.isCollapsed,
-  });
+  const HomeAppBarActions({super.key, required this.isCollapsed});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         Icon(
-          Icons.notifications_outlined,
+          Icons.favorite_outline,
           color: isCollapsed ? Colors.white : Colors.black,
         ),
         const SizedBox(width: 10),
