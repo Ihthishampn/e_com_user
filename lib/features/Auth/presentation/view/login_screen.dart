@@ -1,3 +1,4 @@
+import 'package:e_com_user/features/Auth/presentation/view/otp_screen.dart';
 import 'package:e_com_user/features/Auth/presentation/widgets/get_otp_button.dart';
 import 'package:e_com_user/features/Auth/presentation/widgets/header_image_login.dart';
 import 'package:e_com_user/general/utils/themes/app_text_style.dart';
@@ -5,13 +6,24 @@ import 'package:e_com_user/general/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final phoneController = TextEditingController();
+  State<LoginScreen> createState() => _LoginScreenState();
+}
 
+class _LoginScreenState extends State<LoginScreen> {
+  final phoneController = TextEditingController();
+
+  @override
+  void dispose() {
+    phoneController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -21,13 +33,9 @@ class LoginScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Gap(30),
-
-                // image
                 HeaderImageLogin(),
-
                 const Gap(40),
 
-                
                 Text(
                   "Shop smarter,\nstart with your number",
                   style: AppTextStyles.displaySmall.copyWith(
@@ -41,11 +49,7 @@ class LoginScreen extends StatelessWidget {
 
                 Text(
                   "We’ll send you a secure OTP to continue",
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey.shade600,
-                    height: 1.4,
-                  ),
+                  style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
                 ),
 
                 const Gap(42),
@@ -71,20 +75,28 @@ class LoginScreen extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
                         ),
                       ),
-
                       const Gap(26),
-//tf
-                    CustomTextField(controller: phoneController),
+                      CustomTextField(controller: phoneController),
                     ],
                   ),
                 ),
 
                 const Gap(52),
-//otp
-              GetOtpButton(),
+
+                GetOtpButton(
+                  phoneController: phoneController,
+                  onSuccess: (phone) {
+                    phoneController.clear();
+
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => OtpScreen(phoneN: phone),
+                      ),
+                    );
+                  },
+                ),
 
                 const Gap(18),
 
@@ -92,11 +104,11 @@ class LoginScreen extends StatelessWidget {
                   child: Text(
                     "By continuing you agree to our Terms & Privacy Policy",
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+                    style: TextStyle(fontSize: 11, color: Colors.grey),
                   ),
                 ),
 
-                const Gap(70),
+                const Gap(36),
               ],
             ),
           ),

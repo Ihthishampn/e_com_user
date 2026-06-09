@@ -7,6 +7,7 @@ class HeaderImageLogin extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
+        width: double.infinity,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: Colors.white,

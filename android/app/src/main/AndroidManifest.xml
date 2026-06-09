@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- READ/RECEIVE SMS are restricted; prefer SMS Retriever instead -->
+<uses-permission android:name="android.permission.RECEIVE_SMS"/>
+<uses-permission android:name="android.permission.READ_SMS"/>
     <application
         android:label="e_com_user"
         android:name="${applicationName}"

@@ -1,36 +1,61 @@
-import 'package:e_com_user/general/utils/themes/app_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:e_com_user/features/Auth/presentation/provider/auth_provider.dart';
 
 class GetOtpButton extends StatelessWidget {
-  const GetOtpButton({super.key});
+  final TextEditingController phoneController;
+  final Function(String phone) onSuccess;
+
+  const GetOtpButton({
+    super.key,
+    required this.phoneController,
+    required this.onSuccess,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return   SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed: () {
+    return Consumer<AuthProvider>(
+      builder: (context, prov, _) {
+        return SizedBox(
+          width: double.infinity,
+          height: 52,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            onPressed: prov.isLoading
+                ? null
+                : () async {
+                    final phone = phoneController.text.trim();
+                    if (phone.isEmpty) return;
 
-                      context.go("/otp");
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: const Text(
-                      "Get OTP",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      ),
+                    final ok = await prov.handleSendOtp(phone);
+
+                    if (ok) {
+                      onSuccess(phone);
+                    } else {
+                      // ignore: use_build_context_synchronously
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(prov.error ?? "OTP failed")),
+                      );
+                    }
+                  },
+            child: prov.isLoading
+                ? const CircularProgressIndicator(color: Colors.white)
+                : const Text(
+                    "Get OTP",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                );
+          ),
+        );
+      },
+    );
   }
 }
