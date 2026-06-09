@@ -2,16 +2,39 @@ import 'package:e_com_user/features/Auth/presentation/view/login_screen.dart';
 import 'package:e_com_user/features/Auth/presentation/view/otp_screen.dart';
 import 'package:e_com_user/features/Home/presentation/view/home_screen.dart';
 import 'package:e_com_user/features/Root/presentation/view/root_screen.dart';
+import 'package:e_com_user/general/services/go_route/otp_args.dart';
 import 'package:e_com_user/general/services/go_route/route_names.dart';
 import 'package:go_router/go_router.dart';
 
-final GoRouter goRouter = GoRouter(
-  initialLocation: RouteNames.login,
-  routes: [
-    GoRoute(path: RouteNames.login, builder: (context, state) => LoginScreen()),
+GoRouter createRouter({required bool isLoggedIn}) {
+  final initial = isLoggedIn ? RouteNames.root : RouteNames.login;
 
-    GoRoute(path: RouteNames.home, builder: (context, state) => HomeScreen()),
-    GoRoute(path: RouteNames.otp, builder: (context, state) => OtpScreen(phoneN: "",)),
-    GoRoute(path: RouteNames.root, builder: (context, state) => RootScreen()),
-  ],
-);
+  return GoRouter(
+    initialLocation: initial,
+    routes: [
+      GoRoute(
+        path: RouteNames.login,
+        builder: (context, state) => const LoginScreen(),
+      ),
+
+      GoRoute(
+        path: RouteNames.home,
+        builder: (context, state) => const HomeScreen(),
+      ),
+
+      GoRoute(
+        path: RouteNames.otp,
+        builder: (context, state) {
+          final args = state.extra as OtpArgs;
+
+          return OtpScreen(phoneN: args.phone, name: args.name);
+        },
+      ),
+
+      GoRoute(
+        path: RouteNames.root,
+        builder: (context, state) => const RootScreen(),
+      ),
+    ],
+  );
+}

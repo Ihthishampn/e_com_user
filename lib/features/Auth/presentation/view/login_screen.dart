@@ -1,10 +1,13 @@
-import 'package:e_com_user/features/Auth/presentation/view/otp_screen.dart';
 import 'package:e_com_user/features/Auth/presentation/widgets/get_otp_button.dart';
 import 'package:e_com_user/features/Auth/presentation/widgets/header_image_login.dart';
+import 'package:e_com_user/general/services/go_route/otp_args.dart';
+import 'package:e_com_user/general/services/go_route/route_names.dart';
 import 'package:e_com_user/general/utils/themes/app_text_style.dart';
 import 'package:e_com_user/general/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,10 +18,12 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final phoneController = TextEditingController();
+  final nameController = TextEditingController();
 
   @override
   void dispose() {
     phoneController.dispose();
+    nameController.dispose();
     super.dispose();
   }
 
@@ -33,7 +38,9 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Gap(30),
-                HeaderImageLogin(),
+
+                const HeaderImageLogin(),
+
                 const Gap(40),
 
                 Text(
@@ -71,14 +78,43 @@ class _LoginScreenState extends State<LoginScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
+                        "Full Name",
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+
+                      const Gap(12),
+
+                      CustomTextField(
+                        controller: nameController,
+                        hintText: "Enter your full name",
+                        icon: Icons.person_outline,
+                      ),
+
+                      const Gap(24),
+
+                      const Text(
                         "Mobile Number",
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const Gap(26),
-                      CustomTextField(controller: phoneController),
+
+                      const Gap(12),
+
+                      CustomTextField(
+                        controller: phoneController,
+                        hintText: "Enter your number",
+                        icon: Icons.phone,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(10),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -88,13 +124,22 @@ class _LoginScreenState extends State<LoginScreen> {
                 GetOtpButton(
                   phoneController: phoneController,
                   onSuccess: (phone) {
-                    phoneController.clear();
+                    final name = nameController.text.trim();
 
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => OtpScreen(phoneN: phone),
-                      ),
+                    if (name.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Name is required")),
+                      );
+                      return;
+                    }
+
+                    context.push(
+                      RouteNames.otp,
+                      extra: OtpArgs(phone: phone, name: name),
                     );
+
+                    phoneController.clear();
+                    nameController.clear();
                   },
                 ),
 
@@ -104,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Text(
                     "By continuing you agree to our Terms & Privacy Policy",
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 11, color: Colors.grey),
+                    style: const TextStyle(fontSize: 11, color: Colors.grey),
                   ),
                 ),
 

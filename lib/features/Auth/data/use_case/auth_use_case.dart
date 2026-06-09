@@ -13,5 +13,7 @@ class AuthUseCase {
 
   Future<bool> verifyOtpUse(String phone, String otp) {
     return repo.verifyOtp(phone: phone, otp: otp);
+  } Future<void> createUserToFirebase(String phone, String name) {
+    return repo.sendUserTofirebase(phone: phone, name: name);
   }
 }

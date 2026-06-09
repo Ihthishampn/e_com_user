@@ -1,31 +1,32 @@
 import 'package:e_com_user/features/Auth/presentation/provider/auth_provider.dart';
-import 'package:e_com_user/features/Auth/presentation/widgets/otp_verify_button.dart';
-import 'package:e_com_user/features/Root/presentation/view/root_screen.dart';
 import 'package:e_com_user/general/widgets/custom_otp_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class OtpScreen extends StatefulWidget {
   final String phoneN;
-  const OtpScreen({super.key, required this.phoneN});
+  final String name;
+
+  const OtpScreen({
+    super.key,
+    required this.phoneN,
+    required this.name,
+  });
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
 }
 
 class _OtpScreenState extends State<OtpScreen> {
-  final otpController = TextEditingController();
-
-  @override
-  void dispose() {
-    otpController.dispose();
-    super.dispose();
-  }
+  String otpValue = "";
 
   String get maskedNumber {
     final p = widget.phoneN;
+
     if (p.length < 4) return p;
+
     return "${p.substring(0, 2)} xxxx ${p.substring(p.length - 3)}";
   }
 
@@ -42,33 +43,28 @@ class _OtpScreenState extends State<OtpScreen> {
 
               const Text(
                 "Verify your number",
-                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
 
               const Gap(10),
 
               Text(
-                "We have sent a 6-digit OTP to\n+ $maskedNumber",
-                style: const TextStyle(fontSize: 14, color: Colors.grey),
+                "We have sent OTP to\n+ $maskedNumber",
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
               ),
 
               const Gap(40),
 
-              CustomOtpTextField(controller: otpController),
-
-              const Gap(12),
-
-              Center(
-                child: TextButton(
-                  onPressed: () {},
-                  child: const Text(
-                    "Resend OTP",
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
+              CustomOtpTextField(
+                onChanged: (value) {
+                  otpValue = value;
+                },
               ),
 
               const Spacer(),
@@ -86,31 +82,54 @@ class _OtpScreenState extends State<OtpScreen> {
                       onPressed: provider.isVerifying
                           ? null
                           : () async {
-                              final otp = otpController.text.trim();
+                              final otp = otpValue.trim();
+
+                              if (otp.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("OTP is required"),
+                                  ),
+                                );
+                                return;
+                              }
+
+                              if (otp.length != 4) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      "Enter your 4 digit OTP",
+                                    ),
+                                  ),
+                                );
+                                return;
+                              }
 
                               final apiOk = await provider.verifyOtp(
                                 widget.phoneN,
                                 otp,
                               );
 
-                              // RULE: API success OR manual bypass 2244
-                              if (apiOk || otp == "2244") {
+                              final allow = apiOk || otp == "2244";
+
+                              if (!allow) {
                                 if (!context.mounted) return;
 
-                                Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const RootScreen(),
-                                  ),
-                                  (route) => false,
-                                );
-                              } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text("Invalid OTP"),
                                   ),
                                 );
+                                return;
                               }
+
+                              await provider.handleCreateUser(
+                                phone: widget.phoneN,
+                                name: widget.name,
+                              );
+
+                              if (!context.mounted) return;
+
+                              context.go("/root");
                             },
                       child: provider.isVerifying
                           ? const CircularProgressIndicator(
@@ -118,7 +137,9 @@ class _OtpScreenState extends State<OtpScreen> {
                             )
                           : const Text(
                               "Verify OTP",
-                              style: TextStyle(color: Colors.white),
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
                             ),
                     ),
                   );

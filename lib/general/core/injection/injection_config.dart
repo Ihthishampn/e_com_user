@@ -5,6 +5,6 @@ import 'package:injectable/injectable.dart';
 final GetIt getIt = GetIt.instance;
 
 @injectableInit
-Future<void> confirugationDependency()async {
-  getIt.init();
+Future<void> confirugationDependency() async {
+  await getIt.init();
 }

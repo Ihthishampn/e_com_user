@@ -31,7 +31,22 @@ class GetOtpButton extends StatelessWidget {
                 ? null
                 : () async {
                     final phone = phoneController.text.trim();
-                    if (phone.isEmpty) return;
+                    if (phone.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Number is required")),
+                      );
+                      return;
+                    }
+                    if (phone.length < 10) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            "Please enter a 10-digit phone number.",
+                          ),
+                        ),
+                      );
+                      return;
+                    }
 
                     final ok = await prov.handleSendOtp(phone);
 

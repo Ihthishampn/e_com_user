@@ -3,20 +3,29 @@ import 'package:flutter/services.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
-  const CustomTextField({super.key, required this.controller});
+  final String hintText;
+  final IconData icon;
+  final TextInputType keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
+
+  const CustomTextField({
+    super.key,
+    required this.controller,
+    required this.hintText,
+    required this.icon,
+    this.keyboardType = TextInputType.text,
+    this.inputFormatters,
+  });
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: controller,
-      keyboardType: TextInputType.number,
-      inputFormatters: [
-        FilteringTextInputFormatter.digitsOnly,
-        LengthLimitingTextInputFormatter(10),
-      ],
+      keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
       decoration: InputDecoration(
-        hintText: "Enter 10 digit number",
-        prefixIcon: const Icon(Icons.phone_android),
+        hintText: hintText,
+        prefixIcon: Icon(icon),
         filled: true,
         fillColor: const Color(0xFFF3F5F7),
         border: OutlineInputBorder(

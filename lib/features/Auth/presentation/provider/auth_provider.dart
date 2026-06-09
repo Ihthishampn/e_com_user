@@ -2,12 +2,14 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:e_com_user/features/Auth/data/use_case/auth_use_case.dart';
+import 'package:e_com_user/general/services/local_storage/app_preferences.dart';
 
 @injectable
 class AuthProvider with ChangeNotifier {
   final AuthUseCase useCase;
+  final AppPreferences prefs;
 
-  AuthProvider(this.useCase);
+  AuthProvider(this.useCase, this.prefs);
 
   bool isLoading = false;
   bool isVerifying = false;
@@ -53,5 +55,28 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
       return false;
     }
+  }
+
+  Future<void> handleCreateUser({
+    required String phone,
+    required String name,
+  }) async {
+    try {
+      await useCase.createUserToFirebase(phone, name);
+      log("Success : user cerated firebase");
+      // mark as logged in
+      try {
+        await prefs.setLoggedIn(true);
+      } catch (_) {}
+    } catch (e) {
+      log("error : create user provider :e");
+    }
+  }
+
+  bool get isLoggedIn => prefs.isLoggedin();
+
+  Future<void> setLoggedIn(bool v) async {
+    await prefs.setLoggedIn(v);
+    notifyListeners();
   }
 }

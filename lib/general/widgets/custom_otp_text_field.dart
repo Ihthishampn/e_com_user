@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
 class CustomOtpTextField extends StatelessWidget {
-  final TextEditingController controller;
+  final Function(String)? onChanged;
 
   const CustomOtpTextField({
     super.key,
-    required this.controller,
+    this.onChanged,
   });
 
   @override
@@ -16,8 +16,7 @@ class CustomOtpTextField extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: PinCodeTextField(
         appContext: context,
-        length: 6,
-        controller: controller,
+        length: 4, 
         keyboardType: TextInputType.number,
         animationType: AnimationType.fade,
         cursorColor: AppColors.primaryColor,
@@ -34,10 +33,7 @@ class CustomOtpTextField extends StatelessWidget {
           selectedFillColor: Colors.white,
         ),
         enableActiveFill: true,
-        onChanged: (value) {},
-        onCompleted: (value) {
-          debugPrint("OTP Entered: $value");
-        },
+        onChanged: onChanged ?? (_) {},
       ),
     );
   }
