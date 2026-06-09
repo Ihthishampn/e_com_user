@@ -1,4 +1,6 @@
 import 'package:e_com_user/features/Auth/presentation/provider/auth_provider.dart';
+import 'package:e_com_user/features/Category/presentation/provider/category_provider.dart';
+import 'package:e_com_user/features/Home/presentation/provider/product_provider.dart';
 import 'package:e_com_user/firebase_options.dart';
 import 'package:e_com_user/general/core/injection/injection_config.dart';
 import 'package:e_com_user/general/services/go_route/route_config.dart';
@@ -20,9 +22,26 @@ void main() async {
   final prefs = getIt<AppPreferences>();
   final router = createRouter(isLoggedIn: prefs.isLoggedin());
 
+  // Ensure CategoryProvider and ProductProvider are registered in GetIt
+  // so calls to `getIt<CategoryProvider>()` and `getIt<ProductProvider>()`
+  // return the same instances used by Provider in the widget tree.
+  if (!getIt.isRegistered<CategoryProvider>()) {
+    final catProv = CategoryProvider();
+    getIt.registerSingleton<CategoryProvider>(catProv);
+  }
+
+  if (!getIt.isRegistered<ProductProvider>()) {
+    final prodProv = ProductProvider();
+    getIt.registerSingleton<ProductProvider>(prodProv);
+  }
+
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => getIt<AuthProvider>())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => getIt<AuthProvider>()),
+        ChangeNotifierProvider(create: (_) => getIt<CategoryProvider>()),
+        ChangeNotifierProvider(create: (_) => getIt<ProductProvider>()),
+      ],
       child: EcomUserApp(router: router),
     ),
   );

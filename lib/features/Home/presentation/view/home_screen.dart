@@ -1,5 +1,9 @@
 import 'package:e_com_user/features/Home/presentation/widgets/category_sections.dart';
 import 'package:e_com_user/features/Home/presentation/widgets/costum_prodcut_card.dart';
+import 'package:e_com_user/features/Home/data/model/product_model.dart';
+import 'package:e_com_user/features/Home/presentation/provider/product_provider.dart';
+import 'package:e_com_user/features/Category/presentation/provider/category_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:e_com_user/features/Home/presentation/widgets/custom_search_app_bar.dart';
 import 'package:e_com_user/features/Home/presentation/widgets/home_app_bar_action.dart';
 import 'package:e_com_user/general/utils/themes/app_colors.dart';
@@ -19,10 +23,28 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final categoryProv = Provider.of<CategoryProvider>(context);
+    final productProv = Provider.of<ProductProvider>(context);
+
+    // Determine products to show based on selected category.
+    List<ProductModel> productsToShow = [];
+    if (!productProv.isLoading && productProv.products.isNotEmpty) {
+      if (categoryProv.categories.isNotEmpty &&
+          categoryProv.selectedIndex < categoryProv.categories.length) {
+        final selected = categoryProv.categories[categoryProv.selectedIndex];
+        if (selected.id == 'all') {
+          productsToShow = productProv.products;
+        } else {
+          productsToShow = productProv.productsByCategory(selected.id);
+        }
+      } else {
+        productsToShow = productProv.products;
+      }
+    }
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // ================= APP BAR =================
           SliverAppBar(
             pinned: true,
             expandedHeight: 180,
@@ -71,28 +93,43 @@ class _HomeScreenState extends State<HomeScreen> {
           SliverPersistentHeader(pinned: true, delegate: BestDealsHeader()),
           SliverToBoxAdapter(child: Gap(10)),
 
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            sliver: SliverGrid(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) => ProductCard(index: index),
-                childCount: 20,
+          // If products are loading or empty, show placeholder, else show grid
+          if (productProv.isLoading)
+            const SliverToBoxAdapter(
+              child: SizedBox(
+                height: 160,
+                child: Center(child: CircularProgressIndicator()),
               ),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisExtent: 270,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
+            )
+          else if (productsToShow.isEmpty)
+            const SliverToBoxAdapter(
+              child: SizedBox(
+                height: 120,
+                child: Center(child: Text('No products found')),
+              ),
+            )
+          else
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              sliver: SliverGrid(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) =>
+                      ProductCard(product: productsToShow[index]),
+                  childCount: productsToShow.length,
+                ),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisExtent: 270,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                ),
               ),
             ),
-          ),
         ],
       ),
     );
   }
 }
-
-
 
 class BestDealsHeader extends SliverPersistentHeaderDelegate {
   @override

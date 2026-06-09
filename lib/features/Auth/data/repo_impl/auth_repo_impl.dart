@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
+import 'package:e_com_user/features/Auth/data/model/user_model.dart';
 import 'package:injectable/injectable.dart';
 import 'package:e_com_user/features/Auth/domain/repository/auth_repository.dart';
 import 'package:e_com_user/general/core/keys/keys.dart';
@@ -53,16 +54,11 @@ class AuthRepoImpl implements AuthRepository {
 
   @override
   Future<void> sendUserTofirebase({
-    required String phone,
-    required String name,
+    required UserModel user
   }) async {
     try {
-      final formatedPhone = _formatPhone(phone);
-      await firebaseFirestore.collection("users").doc(formatedPhone).set({
-        "name": name,
-        "phone": phone,
-        "createAt": FieldValue.serverTimestamp(),
-      });
+      
+      await firebaseFirestore.collection("users").doc(user.number).set(user.toMap());
     } catch (e) {
       log("error while assing user to firebase");
     }

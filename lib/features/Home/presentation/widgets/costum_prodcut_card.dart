@@ -1,11 +1,12 @@
+import 'package:e_com_user/features/Home/data/model/product_model.dart';
 import 'package:e_com_user/general/utils/themes/app_colors.dart';
 import 'package:e_com_user/general/utils/themes/app_text_style.dart';
 import 'package:flutter/material.dart';
 
 class ProductCard extends StatelessWidget {
-  final int index;
+  final ProductModel product;
 
-  const ProductCard({required this.index, super.key});
+  const ProductCard({required this.product, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +25,6 @@ class ProductCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // IMAGE
           Expanded(
             flex: 6,
             child: Stack(
@@ -37,34 +37,70 @@ class ProductCard extends StatelessWidget {
                   child: SizedBox(
                     width: double.infinity,
                     height: double.infinity,
-                    child: Image.network(
-                      "https://img.magnific.com/free-psd/sleek-black-headphones-immersive-audio-experience_191095-78145.jpg?semt=ais_hybrid&w=740&q=80",
-                      fit: BoxFit.cover,
+                    child: Container(
+                      color: AppColors.bgWhite,
+                      alignment: Alignment.center,
+                      child: Image.network(
+                        product.images.isNotEmpty
+                            ? product.images.first
+                            : "https://via.placeholder.com/400x300.png?text=Product",
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
                 ),
 
-                Positioned(
-                  top: 3,
-                  left: 4,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Icon(
-                          Icons.local_fire_department,
-                          size: 11,
-                          color: Colors.white,
+                product.isHot
+                    ? Positioned(
+                        top: 3,
+                        left: 4,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Icon(
+                                Icons.local_fire_department,
+                                size: 11,
+                                color: Colors.white,
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
+                      )
+                    : const SizedBox.shrink(),
+                Positioned(
+                  top: 6,
+                  right: 6,
+                  child: GestureDetector(
+                    onTap: () {
+                      // TODO: handle favorite toggle
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.06),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.favorite_border,
+                        size: 18,
+                        color: AppColors.primaryColor,
+                      ),
                     ),
                   ),
                 ),
@@ -81,7 +117,7 @@ class ProductCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Wireless Headphones",
+                    product.productName,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.titleSmall.copyWith(
@@ -93,7 +129,9 @@ class ProductCard extends StatelessWidget {
                   const SizedBox(height: 6),
 
                   Text(
-                    "₹999",
+                    product.variants.isNotEmpty
+                        ? "₹${product.variants.first.sellingPrice.toStringAsFixed(0)}"
+                        : "₹0",
                     style: AppTextStyles.titleMedium.copyWith(
                       fontWeight: FontWeight.w700,
                       color: AppColors.primaryColor,

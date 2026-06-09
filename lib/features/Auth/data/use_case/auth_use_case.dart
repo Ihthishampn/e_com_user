@@ -1,3 +1,4 @@
+import 'package:e_com_user/features/Auth/data/model/user_model.dart';
 import 'package:injectable/injectable.dart';
 import 'package:e_com_user/features/Auth/domain/repository/auth_repository.dart';
 
@@ -13,7 +14,9 @@ class AuthUseCase {
 
   Future<bool> verifyOtpUse(String phone, String otp) {
     return repo.verifyOtp(phone: phone, otp: otp);
-  } Future<void> createUserToFirebase(String phone, String name) {
-    return repo.sendUserTofirebase(phone: phone, name: name);
+  }
+
+  Future<void> createUserToFirebase({required UserModel user}) {
+    return repo.sendUserTofirebase(user: user);
   }
 }

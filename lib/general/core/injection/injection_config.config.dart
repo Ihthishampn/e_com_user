@@ -19,6 +19,17 @@ import 'package:e_com_user/features/Auth/domain/repository/auth_repository.dart'
     as _i1005;
 import 'package:e_com_user/features/Auth/presentation/provider/auth_provider.dart'
     as _i4;
+import 'package:e_com_user/features/Category/data/repo_impl/category_repo_impl.dart'
+    as _i1;
+import 'package:e_com_user/features/Category/data/use_case/category_use_case.dart'
+    as _i372;
+import 'package:e_com_user/features/Category/domain/repo/category_repo.dart'
+    as _i905;
+import 'package:e_com_user/features/Home/data/repo_impl/product_repo_impl.dart'
+    as _i977;
+import 'package:e_com_user/features/Home/data/use_case/product_use_case.dart'
+    as _i891;
+import 'package:e_com_user/features/Home/domain/product_repo.dart' as _i294;
 import 'package:e_com_user/general/core/module/dio_client/dio_module.dart'
     as _i39;
 import 'package:e_com_user/general/core/module/firebase_module/firebase_module.dart'
@@ -48,6 +59,18 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i361.Dio>(() => dioModule.dio());
     gh.lazySingleton<_i974.FirebaseFirestore>(
       () => firebaseModule.firebaseFirestore(),
+    );
+    gh.lazySingleton<_i372.CategoryUseCase>(
+      () => _i372.CategoryUseCase(gh<_i974.FirebaseFirestore>()),
+    );
+    gh.lazySingleton<_i891.ProductUseCase>(
+      () => _i891.ProductUseCase(gh<_i974.FirebaseFirestore>()),
+    );
+    gh.lazySingleton<_i294.ProductRepo>(
+      () => _i977.ProductRepoImpl(gh<_i891.ProductUseCase>()),
+    );
+    gh.lazySingleton<_i905.CategoryRepo>(
+      () => _i1.CategoryRepoImpl(gh<_i372.CategoryUseCase>()),
     );
     gh.lazySingleton<_i1005.AuthRepository>(
       () => _i452.AuthRepoImpl(gh<_i361.Dio>(), gh<_i974.FirebaseFirestore>()),

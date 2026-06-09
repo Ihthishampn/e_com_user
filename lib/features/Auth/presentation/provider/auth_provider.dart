@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:e_com_user/features/Auth/data/model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:e_com_user/features/Auth/data/use_case/auth_use_case.dart';
@@ -62,7 +63,8 @@ class AuthProvider with ChangeNotifier {
     required String name,
   }) async {
     try {
-      await useCase.createUserToFirebase(phone, name);
+      final user = UserModel(id: phone, name: name, number: phone);
+      await useCase.createUserToFirebase(user: user);
       log("Success : user cerated firebase");
       // mark as logged in
       try {
