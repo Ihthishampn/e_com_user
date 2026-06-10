@@ -1,13 +1,12 @@
-// imports moved: Category data provided by CategoryProvider
 import 'package:e_com_user/features/Category/presentation/provider/category_provider.dart';
 import 'package:e_com_user/general/utils/themes/app_colors.dart';
 import 'package:e_com_user/general/utils/themes/app_text_style.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
 import 'package:e_com_user/features/Home/presentation/provider/product_provider.dart';
 import 'package:e_com_user/features/Home/presentation/widgets/costum_prodcut_card.dart';
 import 'package:e_com_user/features/Home/data/model/product_model.dart';
-// no direct DI usage here
 
 class CategoryScreen extends StatelessWidget {
   const CategoryScreen({super.key});
@@ -22,7 +21,10 @@ class CategoryScreen extends StatelessWidget {
           );
         }
 
-        final categories = provider.categories;
+        // Remove "All" category
+        final categories = provider.categories
+            .where((category) => category.id != 'all')
+            .toList();
 
         if (categories.isEmpty) {
           return const Scaffold(
@@ -36,24 +38,19 @@ class CategoryScreen extends StatelessWidget {
 
         final selectedCategory = categories[safeIndex];
 
-        // Compute filtered products for the selected category
-        final ProductProvider productProv = Provider.of<ProductProvider>(
-          context,
-        );
+        final ProductProvider productProv =
+            Provider.of<ProductProvider>(context);
+
         List<ProductModel> productsForCategory = [];
+
         if (!productProv.isLoading) {
-          if (selectedCategory.id == 'all') {
-            productsForCategory = productProv.products;
-          } else {
-            productsForCategory = productProv.productsByCategory(
-              selectedCategory.id,
-            );
-          }
+          productsForCategory = productProv.productsByCategory(
+            selectedCategory.id,
+          );
         }
 
         return Scaffold(
           backgroundColor: Colors.white,
-
           appBar: AppBar(
             backgroundColor: Colors.white,
             surfaceTintColor: Colors.white,
@@ -65,7 +62,6 @@ class CategoryScreen extends StatelessWidget {
               ),
             ),
           ),
-
           body: Column(
             children: [
               // CATEGORY LIST
@@ -80,25 +76,8 @@ class CategoryScreen extends StatelessWidget {
                     final selected = safeIndex == index;
 
                     Widget leading;
-                    if (category.id == 'all') {
-                      leading = Container(
-                        width: 28,
-                        height: 28,
-                        decoration: BoxDecoration(
-                          color: selected
-                              ? Colors.white.withOpacity(0.12)
-                              : AppColors.bgWhite,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Icon(
-                          Icons.grid_view_rounded,
-                          color: selected
-                              ? Colors.white
-                              : AppColors.primaryColor,
-                          size: 18,
-                        ),
-                      );
-                    } else if (category.imageUrl.isEmpty) {
+
+                    if (category.imageUrl.isEmpty) {
                       leading = Container(
                         width: 28,
                         height: 28,
@@ -150,9 +129,8 @@ class CategoryScreen extends StatelessWidget {
                             boxShadow: selected
                                 ? [
                                     BoxShadow(
-                                      color: AppColors.primaryColor.withOpacity(
-                                        0.12,
-                                      ),
+                                      color: AppColors.primaryColor
+                                          .withOpacity(0.12),
                                       blurRadius: 6,
                                       offset: const Offset(0, 3),
                                     ),
@@ -196,7 +174,6 @@ class CategoryScreen extends StatelessWidget {
 
               const Divider(height: 1),
 
-              // SELECTED CATEGORY VIEW
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -216,28 +193,33 @@ class CategoryScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 20),
 
-                      // Product grid for this category
                       Expanded(
                         child: productProv.isLoading
-                            ? const Center(child: CircularProgressIndicator())
-                            : productsForCategory.isEmpty
                             ? const Center(
-                                child: Text('No products in this category'),
+                                child: CircularProgressIndicator(),
                               )
-                            : GridView.builder(
-                                itemCount: productsForCategory.length,
-                                gridDelegate:
-                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                            : productsForCategory.isEmpty
+                                ? const Center(
+                                    child: Text(
+                                      'No products in this category',
+                                    ),
+                                  )
+                                : GridView.builder(
+                                    itemCount: productsForCategory.length,
+                                    gridDelegate:
+                                        const SliverGridDelegateWithFixedCrossAxisCount(
                                       crossAxisCount: 2,
                                       mainAxisExtent: 270,
                                       crossAxisSpacing: 10,
                                       mainAxisSpacing: 10,
                                     ),
-                                itemBuilder: (context, idx) => ProductCard(
-                                  product: productsForCategory[idx],
-                                ),
-                              ),
+                                    itemBuilder: (context, idx) => ProductCard(
+                                      product: productsForCategory[idx],
+                                    ),
+                                  ),
                       ),
+
+                      const Gap(30),
                     ],
                   ),
                 ),
