@@ -1,7 +1,1 @@
-enum ReturnStatus {
-  none,
-  pending,
-  processing,
-  returned,
-  rejected,
-}
+enum ReturnStatus { none, requested, approved, rejected, processed }

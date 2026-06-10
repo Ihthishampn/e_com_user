@@ -26,7 +26,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final categoryProv = Provider.of<CategoryProvider>(context);
     final productProv = Provider.of<ProductProvider>(context);
 
-    // Determine products to show based on selected category.
     List<ProductModel> productsToShow = [];
     if (!productProv.isLoading && productProv.products.isNotEmpty) {
       if (categoryProv.categories.isNotEmpty &&
@@ -93,7 +92,6 @@ class _HomeScreenState extends State<HomeScreen> {
           SliverPersistentHeader(pinned: true, delegate: BestDealsHeader()),
           SliverToBoxAdapter(child: Gap(10)),
 
-          // If products are loading or empty, show placeholder, else show grid
           if (productProv.isLoading)
             const SliverToBoxAdapter(
               child: SizedBox(

@@ -45,6 +45,52 @@ class ProductCard extends StatelessWidget {
                             ? product.images.first
                             : "https://via.placeholder.com/400x300.png?text=Product",
                         fit: BoxFit.contain,
+                        // 1. FRAME BUILDER: Handles instant visual transitions during grid updates
+                        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                          if (wasSynchronouslyLoaded) return child;
+                          return AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 200),
+                            child: frame != null
+                                ? child
+                                :  Center(
+                                    child: SizedBox(
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.5,
+                                        valueColor: AlwaysStoppedAnimation<Color>(
+                                          AppColors.primaryColor,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                          );
+                        },
+                        // 2. LOADING BUILDER: Handles network byte stream transfer indicators
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: AppColors.primaryColor.withOpacity(0.5),
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: AppColors.bgWhite,
+                            alignment: Alignment.center,
+                            child: Icon(
+                              Icons.image_not_supported_outlined,
+                              color: AppColors.lightBlack.withOpacity(0.3),
+                              size: 28,
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),

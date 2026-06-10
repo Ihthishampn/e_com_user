@@ -21,7 +21,6 @@ class CategoryScreen extends StatelessWidget {
           );
         }
 
-        // Remove "All" category
         final categories = provider.categories
             .where((category) => category.id != 'all')
             .toList();
@@ -32,17 +31,25 @@ class CategoryScreen extends StatelessWidget {
           );
         }
 
-        final safeIndex = provider.selectedIndex >= categories.length
-            ? 0
-            : provider.selectedIndex;
+        final currentProviderCatId = provider
+            .categories[provider.selectedIndex >= provider.categories.length
+                ? 0
+                : provider.selectedIndex]
+            .id;
 
-        final selectedCategory = categories[safeIndex];
+        int uiSelectedIndex = categories.indexWhere(
+          (c) => c.id == currentProviderCatId,
+        );
+        if (uiSelectedIndex == -1) {
+          uiSelectedIndex = 0;
+        }
 
-        final ProductProvider productProv =
-            Provider.of<ProductProvider>(context);
+        final selectedCategory = categories[uiSelectedIndex];
 
+        final ProductProvider productProv = Provider.of<ProductProvider>(
+          context,
+        );
         List<ProductModel> productsForCategory = [];
-
         if (!productProv.isLoading) {
           productsForCategory = productProv.productsByCategory(
             selectedCategory.id,
@@ -64,7 +71,6 @@ class CategoryScreen extends StatelessWidget {
           ),
           body: Column(
             children: [
-              // CATEGORY LIST
               SizedBox(
                 height: 56,
                 child: ListView.builder(
@@ -73,10 +79,8 @@ class CategoryScreen extends StatelessWidget {
                   itemCount: categories.length,
                   itemBuilder: (context, index) {
                     final category = categories[index];
-                    final selected = safeIndex == index;
-
+                    final selected = uiSelectedIndex == index;
                     Widget leading;
-
                     if (category.imageUrl.isEmpty) {
                       leading = Container(
                         width: 28,
@@ -106,14 +110,52 @@ class CategoryScreen extends StatelessWidget {
                           width: 28,
                           height: 28,
                           fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return SizedBox(
+                              width: 28,
+                              height: 28,
+                              child: Padding(
+                                padding: const EdgeInsets.all(6.0),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.0,
+                                  color: selected
+                                      ? Colors.white
+                                      : AppColors.primaryColor.withOpacity(0.5),
+                                ),
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              width: 28,
+                              height: 28,
+                              color: selected
+                                  ? Colors.white.withOpacity(0.15)
+                                  : AppColors.bgWhite,
+                              child: Icon(
+                                Icons.category_outlined,
+                                size: 16,
+                                color: selected
+                                    ? Colors.white
+                                    : AppColors.primaryColor,
+                              ),
+                            );
+                          },
                         ),
                       );
                     }
-
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: InkWell(
-                        onTap: () => provider.selectCategory(index),
+                        onTap: () {
+                          final masterIndex = provider.categories.indexWhere(
+                            (c) => c.id == category.id,
+                          );
+                          if (masterIndex != -1) {
+                            provider.selectCategory(masterIndex);
+                          }
+                        },
                         borderRadius: BorderRadius.circular(10),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
@@ -129,8 +171,9 @@ class CategoryScreen extends StatelessWidget {
                             boxShadow: selected
                                 ? [
                                     BoxShadow(
-                                      color: AppColors.primaryColor
-                                          .withOpacity(0.12),
+                                      color: AppColors.primaryColor.withOpacity(
+                                        0.12,
+                                      ),
                                       blurRadius: 6,
                                       offset: const Offset(0, 3),
                                     ),
@@ -171,9 +214,7 @@ class CategoryScreen extends StatelessWidget {
                   },
                 ),
               ),
-
               const Divider(height: 1),
-
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -187,38 +228,28 @@ class CategoryScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        "Category ID: ${selectedCategory.id}",
-                        style: AppTextStyles.bodyMedium,
-                      ),
-                      const SizedBox(height: 20),
 
                       Expanded(
                         child: productProv.isLoading
-                            ? const Center(
-                                child: CircularProgressIndicator(),
-                              )
+                            ? const Center(child: CircularProgressIndicator())
                             : productsForCategory.isEmpty
-                                ? const Center(
-                                    child: Text(
-                                      'No products in this category',
-                                    ),
-                                  )
-                                : GridView.builder(
-                                    itemCount: productsForCategory.length,
-                                    gridDelegate:
-                                        const SliverGridDelegateWithFixedCrossAxisCount(
+                            ? const Center(
+                                child: Text('No products in this category'),
+                              )
+                            : GridView.builder(
+                                itemCount: productsForCategory.length,
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
                                       crossAxisCount: 2,
                                       mainAxisExtent: 270,
                                       crossAxisSpacing: 10,
                                       mainAxisSpacing: 10,
                                     ),
-                                    itemBuilder: (context, idx) => ProductCard(
-                                      product: productsForCategory[idx],
-                                    ),
-                                  ),
+                                itemBuilder: (context, idx) => ProductCard(
+                                  product: productsForCategory[idx],
+                                ),
+                              ),
                       ),
-
                       const Gap(30),
                     ],
                   ),
