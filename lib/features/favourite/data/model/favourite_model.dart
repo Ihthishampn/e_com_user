@@ -1,6 +1,8 @@
+
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class ProductModel {
+class FavModel {
   final String? productId;
   final String productName;
   final String shortNote;
@@ -14,7 +16,7 @@ class ProductModel {
   final List<String> searchKeywords;
   final DateTime? createdAt;
 
-  ProductModel({
+  FavModel({
     this.productId,
     required this.productName,
     required this.shortNote,
@@ -29,8 +31,8 @@ class ProductModel {
     this.searchKeywords = const [],
   });
 
-  factory ProductModel.fromMap(Map<String, dynamic> map, String id) {
-    return ProductModel(
+  factory FavModel.fromMap(Map<String, dynamic> map, String id) {
+    return FavModel(
       productId: id,
       productName: map['productName'] ?? '',
       shortNote: map['shortNote'] ?? '',
@@ -50,7 +52,7 @@ class ProductModel {
     );
   }
 
-  ProductModel copyWith({
+  FavModel copyWith({
     String? id,
     String? productName,
     String? shortNote,
@@ -65,7 +67,7 @@ class ProductModel {
     DateTime? updatedAt,
     List<String>? searchKeywords,
   }) {
-    return ProductModel(
+    return FavModel(
       productId: id ?? this.productId,
       productName: productName ?? this.productName,
       shortNote: shortNote ?? this.shortNote,

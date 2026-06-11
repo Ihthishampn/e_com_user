@@ -1,10 +1,13 @@
-import 'package:e_com_user/features/Home/data/model/product_model.dart';
+import 'package:e_com_user/features/Home/data/model/product_model.dart' as pm;
+import 'package:e_com_user/features/favourite/data/model/favourite_model.dart';
+import 'package:e_com_user/features/favourite/presentation/provider/fav_provider.dart';
 import 'package:e_com_user/general/utils/themes/app_colors.dart';
 import 'package:e_com_user/general/utils/themes/app_text_style.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ProductCard extends StatelessWidget {
-  final ProductModel product;
+  final pm.ProductModel product;
 
   const ProductCard({required this.product, super.key});
 
@@ -45,28 +48,28 @@ class ProductCard extends StatelessWidget {
                             ? product.images.first
                             : "https://via.placeholder.com/400x300.png?text=Product",
                         fit: BoxFit.contain,
-                        // 1. FRAME BUILDER: Handles instant visual transitions during grid updates
-                        frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-                          if (wasSynchronouslyLoaded) return child;
-                          return AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 200),
-                            child: frame != null
-                                ? child
-                                :  Center(
-                                    child: SizedBox(
-                                      width: 24,
-                                      height: 24,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2.5,
-                                        valueColor: AlwaysStoppedAnimation<Color>(
-                                          AppColors.primaryColor,
+                        frameBuilder:
+                            (context, child, frame, wasSynchronouslyLoaded) {
+                              if (wasSynchronouslyLoaded) return child;
+                              return AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 200),
+                                child: frame != null
+                                    ? child
+                                    : Center(
+                                        child: SizedBox(
+                                          width: 24,
+                                          height: 24,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.5,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                  AppColors.primaryColor,
+                                                ),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ),
-                          );
-                        },
-                        // 2. LOADING BUILDER: Handles network byte stream transfer indicators
+                              );
+                            },
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Center(
@@ -75,7 +78,7 @@ class ProductCard extends StatelessWidget {
                               color: AppColors.primaryColor.withOpacity(0.5),
                               value: loadingProgress.expectedTotalBytes != null
                                   ? loadingProgress.cumulativeBytesLoaded /
-                                      loadingProgress.expectedTotalBytes!
+                                        loadingProgress.expectedTotalBytes!
                                   : null,
                             ),
                           );
@@ -98,8 +101,8 @@ class ProductCard extends StatelessWidget {
 
                 product.isHot
                     ? Positioned(
-                        top: 3,
-                        left: 4,
+                        top: 8, // Cleaned up alignment layout
+                        left: 8,
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 8,
@@ -109,12 +112,12 @@ class ProductCard extends StatelessWidget {
                             color: Colors.red,
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: Row(
+                          child: const Row(
                             mainAxisSize: MainAxisSize.min,
-                            children: const [
+                            children: [
                               Icon(
                                 Icons.local_fire_department,
-                                size: 11,
+                                size: 12,
                                 color: Colors.white,
                               ),
                             ],
@@ -122,32 +125,76 @@ class ProductCard extends StatelessWidget {
                         ),
                       )
                     : const SizedBox.shrink(),
+                
                 Positioned(
-                  top: 6,
-                  right: 6,
-                  child: GestureDetector(
-                    onTap: () {
-                      // TODO: handle favorite toggle
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.06),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
+                  top: 8,
+                  right: 8,
+                  child: Consumer<FavProvider>(
+                    builder: (context, pro, child) {
+                      final isFav = pro.favsList.any(
+                        (element) => element.productId == product.productId,
+                      );
+                      return Container(
+                        // Reduced size by dropping padding entirely and setting tight constraints
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: Colors.white, // Solid white background so it's always visible
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.1), // Slightly more pronounced shadow
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: () async {
+                            await pro.handleAddFav(
+                              model: FavModel(
+                                productId: product.productId,
+                                productName: product.productName,
+                                shortNote: product.shortNote,
+                                categoryId: product.categoryId,
+                                additionalNote: product.additionalNote,
+                                createdAt: product.createdAt,
+                                details: product.details
+                                    .map(
+                                      (d) => ProductDetail(
+                                        heading: d.heading,
+                                        content: d.content,
+                                      ),
+                                    )
+                                    .toList(),
+                                images: product.images,
+                                isHot: product.isHot,
+                                rating: product.rating,
+                                searchKeywords: product.searchKeywords,
+                                variants: product.variants
+                                    .map(
+                                      (v) => ProductVariant(
+                                        unit: v.unit,
+                                        variant: v.variant,
+                                        mrp: v.mrp,
+                                        sellingPrice: v.sellingPrice,
+                                        stock: v.stock,
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+                            );
+                          },
+                          icon: Icon(
+                            isFav ? Icons.favorite : Icons.favorite_border_rounded,
+                            size: 16, // Smaller, cute icon profile matching the smaller circle
+                            color: isFav ? Colors.red : AppColors.lightBlack.withOpacity(0.6), // Contrast grey tint when unselected
                           ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.favorite_border,
-                        size: 18,
-                        color: AppColors.primaryColor,
-                      ),
-                    ),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],

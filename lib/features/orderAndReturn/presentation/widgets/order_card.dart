@@ -40,12 +40,35 @@ class OrderCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: Image.network(
-                  image,
-                  width: 56,
-                  height: 56,
-                  fit: BoxFit.cover,
-                ),
+                child: image.startsWith('http')
+                    ? Image.network(
+                        image,
+                        width: 56,
+                        height: 56,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: 56,
+                            height: 56,
+                            color: Colors.grey.shade200,
+                            child: const Icon(
+                              Icons.image_not_supported_outlined,
+                              size: 24,
+                              color: Colors.grey,
+                            ),
+                          );
+                        },
+                      )
+                    : Container(
+                        width: 56,
+                        height: 56,
+                        color: Colors.grey.shade200,
+                        child: const Icon(
+                          Icons.image_not_supported_outlined,
+                          size: 24,
+                          color: Colors.grey,
+                        ),
+                      ),
               ),
               const SizedBox(width: 12),
               Expanded(

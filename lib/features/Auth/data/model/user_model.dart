@@ -20,7 +20,7 @@ class UserModel {
     this.totalAmount = 0,
     this.returnRatio = 0,
   });
-
+  
   factory UserModel.fromMap(Map<String, dynamic> map, String id) {
     return UserModel(
       id: id,

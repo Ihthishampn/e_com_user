@@ -17,14 +17,20 @@ class AuthProvider with ChangeNotifier {
 
   String? error;
 
+  /// Stored after sendOtp succeeds — used by verifyOtp.
+  String? _reqId;
+
+  /// Sends OTP to [phone] and stores the reqId for later verification.
+  /// Returns true on success.
   Future<bool> handleSendOtp(String phone) async {
     isLoading = true;
     error = null;
     notifyListeners();
 
     try {
-      final res = await useCase.sendOtpUse(phone);
-      log("OTP SENT => $res");
+      final reqId = await useCase.sendOtpUse(phone);
+      _reqId = reqId;
+      log("OTP SENT => reqId: $reqId");
 
       isLoading = false;
       notifyListeners();
@@ -37,19 +43,26 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> verifyOtp(String phone, String otp) async {
+  /// Verifies the OTP using the reqId stored from [handleSendOtp].
+  /// Returns true on success, false on failure.
+  Future<bool> verifyOtp(String otp) async {
+    if (_reqId == null) {
+      error = "Session expired. Please request OTP again.";
+      notifyListeners();
+      return false;
+    }
+
     isVerifying = true;
     error = null;
     notifyListeners();
 
     try {
-      final ok = await useCase.verifyOtpUse(phone, otp);
-
-      log("OTP VERIFY => $ok");
+      await useCase.verifyOtpUse(reqId: _reqId!, otp: otp);
+      log("OTP VERIFIED");
 
       isVerifying = false;
       notifyListeners();
-      return ok;
+      return true;
     } catch (e) {
       isVerifying = false;
       error = e.toString();
@@ -58,20 +71,31 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  /// Retries OTP delivery using the stored reqId.
+  Future<void> retryOtp() async {
+    if (_reqId == null) return;
+    try {
+      await useCase.retryOtpUse(reqId: _reqId!);
+      log("OTP RETRY requested");
+    } catch (e) {
+      log("OTP RETRY error: $e");
+    }
+  }
+
+  /// Creates the user in Firestore and marks as logged in.
   Future<void> handleCreateUser({
     required String phone,
     required String name,
   }) async {
     try {
       final user = UserModel(id: phone, name: name, number: phone);
-      await useCase.createUserToFirebase(user: user);
-      log("Success : user cerated firebase");
-      // mark as logged in
+      await useCase.saveUser(user: user);
+      log("User saved to Firestore: $phone");
       try {
         await prefs.setLoggedIn(true);
       } catch (_) {}
     } catch (e) {
-      log("error : create user provider :e");
+      log("Error creating user: $e");
     }
   }
 

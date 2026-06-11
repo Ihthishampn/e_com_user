@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
 import 'package:e_com_user/features/Home/presentation/provider/product_provider.dart';
-import 'package:e_com_user/features/Home/presentation/widgets/costum_prodcut_card.dart';
+import 'package:e_com_user/features/Home/presentation/widgets/custum_prodcut_card.dart';
 import 'package:e_com_user/features/Home/data/model/product_model.dart';
 
 class CategoryScreen extends StatelessWidget {
@@ -71,24 +71,34 @@ class CategoryScreen extends StatelessWidget {
           ),
           body: Column(
             children: [
+              // 1. Reduced height drastically from 96 to 54 to match the micro-chip style
               SizedBox(
-                height: 56,
+                height: 54,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   itemCount: categories.length,
                   itemBuilder: (context, index) {
                     final category = categories[index];
                     final selected = uiSelectedIndex == index;
+
+                    // 2. Dynamic Image Size: Made it much smaller by default (24), and even smaller when selected (20)
+                    double imageSize = selected ? 20.0 : 24.0;
+
                     Widget leading;
                     if (category.imageUrl.isEmpty) {
                       leading = Container(
-                        width: 28,
-                        height: 28,
+                        width: imageSize,
+                        height: imageSize,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: AppColors.bgWhite,
-                          borderRadius: BorderRadius.circular(6),
+                          color: selected
+                              ? Colors.white.withValues(alpha: 0.2)
+                              : AppColors.bgWhite,
+                          shape: BoxShape.circle,
                         ),
                         child: Text(
                           category.categoryName.isNotEmpty
@@ -99,43 +109,46 @@ class CategoryScreen extends StatelessWidget {
                                 ? Colors.white
                                 : AppColors.primaryColor,
                             fontWeight: FontWeight.w700,
+                            fontSize: selected ? 11 : 13,
                           ),
                         ),
                       );
                     } else {
                       leading = ClipRRect(
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(100),
                         child: Image.network(
                           category.imageUrl,
-                          width: 28,
-                          height: 28,
+                          width: imageSize,
+                          height: imageSize,
                           fit: BoxFit.cover,
                           loadingBuilder: (context, child, loadingProgress) {
                             if (loadingProgress == null) return child;
                             return SizedBox(
-                              width: 28,
-                              height: 28,
+                              width: imageSize,
+                              height: imageSize,
                               child: Padding(
-                                padding: const EdgeInsets.all(6.0),
+                                padding: const EdgeInsets.all(4.0),
                                 child: CircularProgressIndicator(
-                                  strokeWidth: 2.0,
+                                  strokeWidth: 1.5,
                                   color: selected
                                       ? Colors.white
-                                      : AppColors.primaryColor.withOpacity(0.5),
+                                      : AppColors.primaryColor.withValues(
+                                          alpha: 0.5,
+                                        ),
                                 ),
                               ),
                             );
                           },
                           errorBuilder: (context, error, stackTrace) {
                             return Container(
-                              width: 28,
-                              height: 28,
+                              width: imageSize,
+                              height: imageSize,
                               color: selected
-                                  ? Colors.white.withOpacity(0.15)
+                                  ? Colors.white.withValues(alpha: 0.15)
                                   : AppColors.bgWhite,
                               child: Icon(
                                 Icons.category_outlined,
-                                size: 16,
+                                size: selected ? 12 : 14,
                                 color: selected
                                     ? Colors.white
                                     : AppColors.primaryColor,
@@ -156,51 +169,43 @@ class CategoryScreen extends StatelessWidget {
                             provider.selectCategory(masterIndex);
                           }
                         },
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(
+                          30,
+                        ), // Circular capsule look
                         child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 8,
+                          duration: const Duration(milliseconds: 150),
+                          // 3. Dynamic Padding: Reduces horizontal padding when selected to make the chip tighter
+                          padding: EdgeInsets.symmetric(
+                            horizontal: selected ? 10 : 14,
+                            vertical: 4,
                           ),
                           decoration: BoxDecoration(
                             color: selected
                                 ? AppColors.primaryColor
-                                : Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: selected
-                                ? [
-                                    BoxShadow(
-                                      color: AppColors.primaryColor.withOpacity(
-                                        0.12,
-                                      ),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ]
-                                : [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.02),
-                                      blurRadius: 2,
-                                      offset: const Offset(0, 1),
-                                    ),
-                                  ],
+                                : AppColors.bgWhite,
+                            borderRadius: BorderRadius.circular(30),
                             border: Border.all(
                               color: selected
                                   ? Colors.transparent
-                                  : AppColors.primaryColor.withOpacity(0.08),
+                                  : AppColors.lightBlack.withValues(
+                                      alpha: 0.05,
+                                    ),
                             ),
                           ),
+                          // 4. Changed back to a horizontal Row for clean layout spacing
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               leading,
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 6),
                               Text(
                                 category.categoryName,
                                 style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
+                                  // 5. Dynamic Text Size: Shrunk text to 11 when selected
+                                  fontSize: selected ? 11 : 12,
+                                  fontWeight: selected
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
                                   color: selected
                                       ? Colors.white
                                       : AppColors.lightBlack,

@@ -1,7 +1,8 @@
 
-import 'package:e_com_user/features/Auth/data/model/return_refund_model.dart';
-import 'package:e_com_user/features/Auth/data/model/shipping_model.dart';
+import 'package:e_com_user/features/orderAndReturn/data/model/return_refund_model.dart';
+import 'package:e_com_user/features/orderAndReturn/data/model/shipping_model.dart';
 import 'package:e_com_user/general/utils/enums/order_status.dart';
+import 'package:e_com_user/general/utils/enums/payment_method.dart';
 import 'package:e_com_user/general/utils/enums/payment_status.dart';
 
 class OrderModel {
@@ -10,7 +11,7 @@ class OrderModel {
   final String userName;         
   final String userPhone;        
   final DateTime date;
-  final String paymentMethod;
+  final PaymentMethod paymentMethod;
   final PaymentStatus paymentStatus;
   final OrderStatus orderStatus;
   final double amount;

@@ -5,6 +5,9 @@ class CartItemWidget extends StatelessWidget {
   final String price;
   final String image;
   final int quantity;
+  final VoidCallback? onIncrement;
+  final VoidCallback? onDecrement;
+  final bool isCartScreen;
 
   const CartItemWidget({
     super.key,
@@ -12,6 +15,9 @@ class CartItemWidget extends StatelessWidget {
     required this.price,
     required this.image,
     required this.quantity,
+    required this.onDecrement,
+    required this.onIncrement,
+    required this.isCartScreen,
   });
 
   @override
@@ -21,7 +27,35 @@ class CartItemWidget extends StatelessWidget {
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(8),
-          child: Image.network(image, width: 56, height: 56, fit: BoxFit.cover),
+          child: image.startsWith('http')
+              ? Image.network(
+                  image,
+                  width: 56,
+                  height: 56,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: 56,
+                      height: 56,
+                      color: Colors.grey.shade200,
+                      child: const Icon(
+                        Icons.image_not_supported_outlined,
+                        size: 24,
+                        color: Colors.grey,
+                      ),
+                    );
+                  },
+                )
+              : Container(
+                  width: 56,
+                  height: 56,
+                  color: Colors.grey.shade200,
+                  child: const Icon(
+                    Icons.image_not_supported_outlined,
+                    size: 24,
+                    color: Colors.grey,
+                  ),
+                ),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -40,21 +74,38 @@ class CartItemWidget extends StatelessWidget {
             ],
           ),
         ),
-
-        // Compact quantity badge (read-only)
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          decoration: BoxDecoration(
-            color: Colors.grey.shade100,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade200),
-          ),
-          child: Text(
-            'Qty: $quantity',
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
+//  + and - 
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildQtyButton(icon: Icons.remove, onTap: onDecrement),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              child: Text(
+                '$quantity',
+                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+              ),
+            ),
+            _buildQtyButton(icon: Icons.add, onTap: onIncrement),
+          ],
         ),
       ],
+    );
+  }
+
+   Widget _buildQtyButton({required IconData icon, VoidCallback? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: Icon(icon, size: 14, color: Colors.grey.shade700),
+      ),
     );
   }
 }

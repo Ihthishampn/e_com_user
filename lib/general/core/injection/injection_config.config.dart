@@ -25,6 +25,14 @@ import 'package:e_com_user/features/Category/data/use_case/category_use_case.dar
     as _i372;
 import 'package:e_com_user/features/Category/domain/repo/category_repo.dart'
     as _i905;
+import 'package:e_com_user/features/favourite/data/repo_impl/favourite_repo_impl.dart'
+    as _i313;
+import 'package:e_com_user/features/favourite/data/use_case/fav_use_case.dart'
+    as _i496;
+import 'package:e_com_user/features/favourite/domain/repo/fav_repo.dart'
+    as _i460;
+import 'package:e_com_user/features/favourite/presentation/provider/fav_provider.dart'
+    as _i963;
 import 'package:e_com_user/features/Home/data/repo_impl/product_repo_impl.dart'
     as _i977;
 import 'package:e_com_user/features/Home/data/use_case/product_use_case.dart'
@@ -66,20 +74,27 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i891.ProductUseCase>(
       () => _i891.ProductUseCase(gh<_i974.FirebaseFirestore>()),
     );
+    gh.lazySingleton<_i496.FavUseCase>(
+      () => _i496.FavUseCase(gh<_i974.FirebaseFirestore>()),
+    );
     gh.lazySingleton<_i294.ProductRepo>(
       () => _i977.ProductRepoImpl(gh<_i891.ProductUseCase>()),
     );
     gh.lazySingleton<_i905.CategoryRepo>(
       () => _i1.CategoryRepoImpl(gh<_i372.CategoryUseCase>()),
     );
-    gh.lazySingleton<_i1005.AuthRepository>(
-      () => _i452.AuthRepoImpl(gh<_i361.Dio>(), gh<_i974.FirebaseFirestore>()),
-    );
-    gh.lazySingleton<_i273.AuthUseCase>(
-      () => _i273.AuthUseCase(gh<_i1005.AuthRepository>()),
+    gh.lazySingleton<_i460.FavRepo>(
+      () => _i313.FavouriteRepoImpl(gh<_i496.FavUseCase>()),
     );
     gh.singleton<_i585.AppPreferences>(
       () => preferenceModule.appPreferences(gh<_i460.SharedPreferences>()),
+    );
+    gh.lazySingleton<_i1005.AuthRepository>(
+      () => _i452.AuthRepoImpl(gh<_i974.FirebaseFirestore>()),
+    );
+    gh.factory<_i963.FavProvider>(() => _i963.FavProvider(gh<_i460.FavRepo>()));
+    gh.lazySingleton<_i273.AuthUseCase>(
+      () => _i273.AuthUseCase(gh<_i1005.AuthRepository>()),
     );
     gh.factory<_i4.AuthProvider>(
       () =>

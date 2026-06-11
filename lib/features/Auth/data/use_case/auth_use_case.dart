@@ -8,15 +8,29 @@ class AuthUseCase {
 
   AuthUseCase(this.repo);
 
-  Future<Map<String, dynamic>> sendOtpUse(String phone) {
+  /// Sends OTP and returns the reqId needed for verification.
+  Future<String> sendOtpUse(String phone) {
     return repo.sendOtp(phone: phone);
   }
 
-  Future<bool> verifyOtpUse(String phone, String otp) {
-    return repo.verifyOtp(phone: phone, otp: otp);
+  /// Verifies OTP using the reqId returned by sendOtpUse.
+  Future<void> verifyOtpUse({required String reqId, required String otp}) {
+    return repo.verifyOtp(reqId: reqId, otp: otp);
   }
 
-  Future<void> createUserToFirebase({required UserModel user}) {
-    return repo.sendUserTofirebase(user: user);
+  Future<void> retryOtpUse({required String reqId}) {
+    return repo.retryOtp(reqId: reqId);
+  }
+
+  Future<void> saveUser({required UserModel user}) {
+    return repo.saveUser(user: user);
+  }
+
+  Future<bool> isUserExist({required String phone}) {
+    return repo.isUserExist(phone: phone);
+  }
+
+  Future<UserModel?> getUser({required String phone}) {
+    return repo.getUser(phone: phone);
   }
 }

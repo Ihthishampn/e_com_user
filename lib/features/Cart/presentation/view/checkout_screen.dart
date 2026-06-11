@@ -1,7 +1,6 @@
 import 'package:e_com_user/features/Cart/presentation/widgets/address_list.dart';
 import 'package:e_com_user/features/Cart/presentation/widgets/checkout_summary.dart';
 import 'package:e_com_user/features/Cart/presentation/widgets/cart_item_widget.dart';
-import 'package:e_com_user/general/utils/themes/app_colors.dart';
 import 'package:e_com_user/general/utils/themes/app_text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -80,6 +79,9 @@ class CheckoutScreen extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final it = items[index];
                         return CartItemWidget(
+                          isCartScreen: false,
+                          onDecrement: (){},
+                          onIncrement:(){},
                           name: it['name'] as String,
                           price: it['price'] as String,
                           image: it['image'] as String,

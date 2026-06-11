@@ -104,12 +104,9 @@ class _OtpScreenState extends State<OtpScreen> {
                                 return;
                               }
 
-                              final apiOk = await provider.verifyOtp(
-                                widget.phoneN,
-                                otp,
-                              );
+                              final apiOk = await provider.verifyOtp(otp);
 
-                              final allow = apiOk || otp == "2244";
+                              final allow = apiOk;
 
                               if (!allow) {
                                 if (!context.mounted) return;

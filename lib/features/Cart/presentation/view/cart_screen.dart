@@ -1,3 +1,4 @@
+import 'package:e_com_user/features/Cart/data/model/cart_item_model.dart';
 import 'package:e_com_user/general/utils/themes/app_colors.dart';
 import 'package:e_com_user/general/utils/themes/app_text_style.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +34,15 @@ class _CartScreenState extends State<CartScreen> {
       'qty': 1,
     },
   ];
+
+  final CartItemModel cartIems = CartItemModel(
+    productId: "23",
+    productName: "productName",
+    quantity: 3,
+    productPrice: 44,
+    imageUrl: "https://picsum.photos/200",
+    availableStock: 32,
+  );
 
   int _parsePrice(String price) =>
       int.tryParse(price.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
@@ -102,9 +112,8 @@ class _CartScreenState extends State<CartScreen> {
 
       body: ListView.builder(
         padding: const EdgeInsets.all(12),
-        itemCount: _items.length,
+        itemCount: 1,
         itemBuilder: (context, index) {
-          final it = _items[index];
           return Container(
             margin: const EdgeInsets.only(bottom: 8),
             padding: const EdgeInsets.all(10),
@@ -116,10 +125,15 @@ class _CartScreenState extends State<CartScreen> {
               ],
             ),
             child: CartItemWidget(
-              name: it['name'] as String,
-              price: it['price'] as String,
-              image: it['image'] as String,
-              quantity: it['qty'] as int,
+              isCartScreen: true,
+              onDecrement:(){
+                
+              },
+              onIncrement:(){},
+              name: cartIems.productName,
+              price: "₹${cartIems.productPrice}",
+              image: cartIems.imageUrl,
+              quantity: cartIems.quantity,
             ),
           );
         },

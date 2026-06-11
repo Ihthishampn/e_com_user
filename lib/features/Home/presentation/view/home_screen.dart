@@ -1,8 +1,9 @@
 import 'package:e_com_user/features/Home/presentation/widgets/category_sections.dart';
-import 'package:e_com_user/features/Home/presentation/widgets/costum_prodcut_card.dart';
+import 'package:e_com_user/features/Home/presentation/widgets/custum_prodcut_card.dart';
 import 'package:e_com_user/features/Home/data/model/product_model.dart';
 import 'package:e_com_user/features/Home/presentation/provider/product_provider.dart';
 import 'package:e_com_user/features/Category/presentation/provider/category_provider.dart';
+import 'package:e_com_user/features/Home/presentation/provider/home_provider.dart'; // Make sure to import your new provider file
 import 'package:provider/provider.dart';
 import 'package:e_com_user/features/Home/presentation/widgets/custom_search_app_bar.dart';
 import 'package:e_com_user/features/Home/presentation/widgets/home_app_bar_action.dart';
@@ -11,15 +12,8 @@ import 'package:e_com_user/general/utils/themes/app_text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  bool isCollapsed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -44,53 +38,57 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar(
-            pinned: true,
-            expandedHeight: 180,
-            elevation: 0,
-            surfaceTintColor: Colors.transparent,
-            backgroundColor: isCollapsed
-                ? AppColors.primaryColor
-                : AppColors.white,
+          // Using a Consumer here ensures scroll-triggered color updates don't rebuild the entire screen grid below
+          Consumer<HomeProvider>(
+            builder: (context, homeProv, child) {
+              return SliverAppBar(
+                pinned: true,
+                expandedHeight: 180,
+                elevation: 0,
+                surfaceTintColor: Colors.transparent,
+                backgroundColor: homeProv.isCollapsed
+                    ? AppColors.primaryColor
+                    : AppColors.white,
 
-            title: Row(
-              children: [
-                Expanded(child: AppSearchBar(isCollapsed: isCollapsed)),
-                const SizedBox(width: 10),
-                HomeAppBarActions(isCollapsed: isCollapsed),
-              ],
-            ),
+                title: Row(
+                  children: [
+                    Expanded(child: AppSearchBar(isCollapsed: homeProv.isCollapsed)),
+                    const SizedBox(width: 10),
+                    HomeAppBarActions(isCollapsed: homeProv.isCollapsed),
+                  ],
+                ),
 
-            flexibleSpace: LayoutBuilder(
-              builder: (context, constraints) {
-                final topPadding = MediaQuery.of(context).padding.top;
-                final collapsed =
-                    constraints.biggest.height <= kToolbarHeight + topPadding;
+                flexibleSpace: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final topPadding = MediaQuery.of(context).padding.top;
+                    final collapsed =
+                        constraints.biggest.height <= kToolbarHeight + topPadding;
 
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (collapsed != isCollapsed) {
-                    setState(() => isCollapsed = collapsed);
-                  }
-                });
+                    // Safely schedules updates to the layout tree during state notification cycles
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      context.read<HomeProvider>().setCollapsed(collapsed);
+                    });
 
-                return FlexibleSpaceBar(
-                  background: SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        top: 60,
-                        left: 12,
-                        right: 12,
+                    return FlexibleSpaceBar(
+                      background: SafeArea(
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            top: 60,
+                            left: 12,
+                            right: 12,
+                          ),
+                          child: CategorySection(),
+                        ),
                       ),
-                      child: CategorySection(),
-                    ),
-                  ),
-                );
-              },
-            ),
+                    );
+                  },
+                ),
+              );
+            },
           ),
 
           SliverPersistentHeader(pinned: true, delegate: BestDealsHeader()),
-          SliverToBoxAdapter(child: Gap(10)),
+          const SliverToBoxAdapter(child: Gap(10)),
 
           if (productProv.isLoading)
             const SliverToBoxAdapter(
