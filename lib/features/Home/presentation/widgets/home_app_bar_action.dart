@@ -1,5 +1,7 @@
+import 'package:e_com_user/features/favourite/presentation/provider/fav_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 class HomeAppBarActions extends StatelessWidget {
   final bool isCollapsed;
@@ -44,14 +46,18 @@ class HomeAppBarActions extends StatelessWidget {
                 ),
                 constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
                 child: Center(
-                  child: Text(
-                    "1",
-                    style: TextStyle(
-                      color: isCollapsed ? Colors.white : Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 10,
-                      height: 1.0,
-                    ),
+                  child: Consumer<FavProvider>(
+                    builder: (context, favs, child) {
+                      return Text(
+                        "${favs.favsList.length}",
+                        style: TextStyle(
+                          color: isCollapsed ? Colors.white : Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10,
+                          height: 1.0,
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -63,11 +69,7 @@ class HomeAppBarActions extends StatelessWidget {
           onPressed: () {
             context.push("cart");
           },
-          icon: Icon(
-            Icons.shopping_cart_outlined,
-            color: Colors.red,
-            size: 26,
-          ),
+          icon: Icon(Icons.shopping_cart_outlined, color: Colors.red, size: 26),
         ),
         const SizedBox(width: 8),
       ],

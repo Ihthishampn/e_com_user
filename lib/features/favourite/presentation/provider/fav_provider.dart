@@ -20,7 +20,7 @@ class FavProvider with ChangeNotifier {
 
   List<FavModel> favsList = [];
 
-  Future<void> handleAddFav({required FavModel model}) async {
+  Future<void> handleAddOrRemoveFav({required FavModel model}) async {
     if (addStateFavs == AppState.loading) return;
 
     addStateFavs = AppState.loading;

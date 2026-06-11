@@ -13,6 +13,12 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasVariant = product.variants.isNotEmpty;
+    final mainVariant = hasVariant ? product.variants.first : null;
+
+    final sellingPrice = mainVariant?.sellingPrice ?? 0.0;
+    final mrp = mainVariant?.mrp ?? 0.0;
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
@@ -28,6 +34,7 @@ class ProductCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ---------------- IMAGE SECTION ----------------
           Expanded(
             flex: 6,
             child: Stack(
@@ -48,104 +55,53 @@ class ProductCard extends StatelessWidget {
                             ? product.images.first
                             : "https://via.placeholder.com/400x300.png?text=Product",
                         fit: BoxFit.contain,
-                        frameBuilder:
-                            (context, child, frame, wasSynchronouslyLoaded) {
-                              if (wasSynchronouslyLoaded) return child;
-                              return AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 200),
-                                child: frame != null
-                                    ? child
-                                    : Center(
-                                        child: SizedBox(
-                                          width: 24,
-                                          height: 24,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2.5,
-                                            valueColor:
-                                                AlwaysStoppedAnimation<Color>(
-                                                  AppColors.primaryColor,
-                                                ),
-                                          ),
-                                        ),
-                                      ),
-                              );
-                            },
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Center(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.5,
-                              color: AppColors.primaryColor.withOpacity(0.5),
-                              value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
-                                  : null,
-                            ),
-                          );
-                        },
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: AppColors.bgWhite,
-                            alignment: Alignment.center,
-                            child: Icon(
-                              Icons.image_not_supported_outlined,
-                              color: AppColors.lightBlack.withOpacity(0.3),
-                              size: 28,
-                            ),
-                          );
-                        },
                       ),
                     ),
                   ),
                 ),
 
-                product.isHot
-                    ? Positioned(
-                        top: 8, // Cleaned up alignment layout
-                        left: 8,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.local_fire_department,
-                                size: 12,
-                                color: Colors.white,
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                    : const SizedBox.shrink(),
-                
+                // HOT BADGE
+                if (product.isHot)
+                  Positioned(
+                    top: 8,
+                    left: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Icon(
+                        Icons.local_fire_department,
+                        size: 12,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+
+                // FAV ICON
                 Positioned(
                   top: 8,
                   right: 8,
                   child: Consumer<FavProvider>(
                     builder: (context, pro, child) {
                       final isFav = pro.favsList.any(
-                        (element) => element.productId == product.productId,
+                        (e) => e.productId == product.productId,
                       );
+
                       return Container(
-                        // Reduced size by dropping padding entirely and setting tight constraints
-                        width: 28,
-                        height: 28,
+                        width: 30,
+                        height: 30,
                         decoration: BoxDecoration(
-                          color: Colors.white, // Solid white background so it's always visible
+                          color: Colors.white,
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1), // Slightly more pronounced shadow
+                              color: Colors.black.withOpacity(0.1),
                               blurRadius: 6,
-                              offset: const Offset(0, 2),
                             ),
                           ],
                         ),
@@ -153,7 +109,7 @@ class ProductCard extends StatelessWidget {
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
                           onPressed: () async {
-                            await pro.handleAddFav(
+                            await pro.handleAddOrRemoveFav(
                               model: FavModel(
                                 productId: product.productId,
                                 productName: product.productName,
@@ -188,9 +144,11 @@ class ProductCard extends StatelessWidget {
                             );
                           },
                           icon: Icon(
-                            isFav ? Icons.favorite : Icons.favorite_border_rounded,
-                            size: 16, // Smaller, cute icon profile matching the smaller circle
-                            color: isFav ? Colors.red : AppColors.lightBlack.withOpacity(0.6), // Contrast grey tint when unselected
+                            isFav ? Icons.favorite : Icons.favorite_border,
+                            size: 18,
+                            color: isFav
+                                ? Colors.red
+                                : AppColors.lightBlack.withOpacity(0.6),
                           ),
                         ),
                       );
@@ -201,7 +159,7 @@ class ProductCard extends StatelessWidget {
             ),
           ),
 
-          // DETAILS
+          // ---------------- DETAILS ----------------
           Expanded(
             flex: 4,
             child: Padding(
@@ -209,6 +167,7 @@ class ProductCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // PRODUCT NAME
                   Text(
                     product.productName,
                     maxLines: 2,
@@ -221,18 +180,33 @@ class ProductCard extends StatelessWidget {
 
                   const SizedBox(height: 6),
 
-                  Text(
-                    product.variants.isNotEmpty
-                        ? "₹${product.variants.first.sellingPrice.toStringAsFixed(0)}"
-                        : "₹0",
-                    style: AppTextStyles.titleMedium.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primaryColor,
-                    ),
+                  // PRICE (NEW)
+                  Row(
+                    children: [
+                      Text(
+                        "₹${sellingPrice.toStringAsFixed(0)}",
+                        style: AppTextStyles.titleMedium.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primaryColor,
+                        ),
+                      ),
+
+                      const SizedBox(width: 6),
+
+                      if (mrp > sellingPrice)
+                        Text(
+                          "₹${mrp.toStringAsFixed(0)}",
+                          style: AppTextStyles.bodySmall.copyWith(
+                            decoration: TextDecoration.lineThrough,
+                            color: Colors.grey,
+                          ),
+                        ),
+                    ],
                   ),
 
                   const SizedBox(height: 8),
 
+                  // RATING + CART
                   Row(
                     children: [
                       const Icon(
@@ -241,7 +215,6 @@ class ProductCard extends StatelessWidget {
                         color: Colors.amber,
                       ),
                       const SizedBox(width: 4),
-
                       Text(
                         "4.8",
                         style: AppTextStyles.bodySmall.copyWith(

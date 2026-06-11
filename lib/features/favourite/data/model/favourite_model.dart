@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FavModel {
   final String? productId;
+
   final String productName;
   final String shortNote;
   final String categoryId;
