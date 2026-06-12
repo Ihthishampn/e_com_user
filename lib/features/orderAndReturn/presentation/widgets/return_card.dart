@@ -1,3 +1,4 @@
+import 'package:e_com_user/features/orderAndReturn/presentation/view/track_order_screen.dart';
 import 'package:flutter/material.dart';
 
 class ReturnCard extends StatelessWidget {
@@ -21,108 +22,143 @@ class ReturnCard extends StatelessWidget {
     const primaryColor = Color.fromARGB(255, 50, 43, 150);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFEDF2F7), width: 1.5),
         boxShadow: [
-          BoxShadow(color: Colors.grey.withOpacity(.06), blurRadius: 8),
+          BoxShadow(
+            color: const Color(0xFF0F172A).withValues(alpha: 0.03),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
         ],
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: image.startsWith('http')
-                ? Image.network(
-                    image,
-                    width: 56,
-                    height: 56,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        width: 56,
-                        height: 56,
-                        color: Colors.grey.shade200,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: image.startsWith('http')
+                    ? Image.network(
+                        image,
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: 60,
+                            height: 60,
+                            color: const Color(0xFFF1F5F9),
+                            child: const Icon(
+                              Icons.image_not_supported_outlined,
+                              size: 24,
+                              color: Colors.grey,
+                            ),
+                          );
+                        },
+                      )
+                    : Container(
+                        width: 60,
+                        height: 60,
+                        color: const Color(0xFFF1F5F9),
                         child: const Icon(
                           Icons.image_not_supported_outlined,
                           size: 24,
                           color: Colors.grey,
                         ),
-                      );
-                    },
-                  )
-                : Container(
-                    width: 56,
-                    height: 56,
-                    color: Colors.grey.shade200,
-                    child: const Icon(
-                      Icons.image_not_supported_outlined,
-                      size: 24,
-                      color: Colors.grey,
+                      ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: Color(0xFF0F172A),
+                      ),
                     ),
-                  ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                  ),
+                    const SizedBox(height: 6),
+                    Text(
+                      price,
+                      style: TextStyle(
+                        color: primaryColor,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  price,
-                  style: const TextStyle(
-                    color: primaryColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
+              ),
+              const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(.12),
-                  borderRadius: BorderRadius.circular(30),
+                  color: statusColor.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   status,
                   style: TextStyle(
                     color: statusColor,
-                    fontWeight: FontWeight.w600,
                     fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.1,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(width: 8),
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: primaryColor,
+                side: BorderSide(color: primaryColor.withValues(alpha: 0.2), width: 1.5),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => TrackOrderScreen(
+                      orderId: '',
+                      productName: name,
+                      orderStatus: status,
+                      isReturn: true,
+                    ),
+                  ),
+                );
+              },
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.info_outline_rounded, size: 16),
+                  SizedBox(width: 6),
+                  Text(
+                    'View Details',
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
             ),
-            child: const Text('Details', style: TextStyle(fontSize: 13, color: Colors.white)),
-          ),
-        ],
+      )],
       ),
     );
   }

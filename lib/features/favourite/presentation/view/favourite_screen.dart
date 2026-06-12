@@ -23,21 +23,22 @@ class FavouriteScreen extends StatelessWidget {
           fontSize: 20,
         ),
       ),
-      body: Consumer<FavProvider>(builder: (context, value, child) => GridView.builder(
-        
-        padding: const EdgeInsets.all(12),
-        itemCount: value.favsList.length,
+      body: Consumer<FavProvider>(
+        builder: (context, value, child) => GridView.builder(
+          padding: const EdgeInsets.all(12),
+          itemCount: value.favsList.length,
 
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          mainAxisExtent: width < 370 ? 280 : 350,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            mainAxisExtent: width < 370 ? 280 : 350,
+          ),
+          itemBuilder: (context, index) {
+            return FavProductCard(model: value.favsList[index]);
+          },
         ),
-        itemBuilder: (context, index) {
-          return  FavProductCard(model:value.favsList[index] ,);
-        },
-      ),)
+      ),
     );
   }
 }

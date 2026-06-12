@@ -10,12 +10,16 @@ class TrackOrderScreen extends StatelessWidget {
   final String orderId;
   final String productName;
   final String orderStatus;
+  final bool isReturn;
+  final List<String>? customStatuses;
 
   const TrackOrderScreen({
     super.key,
     required this.orderId,
     required this.productName,
     required this.orderStatus,
+    this.isReturn = false,
+    this.customStatuses,
   });
 
   @override
@@ -37,7 +41,7 @@ class TrackOrderScreen extends StatelessWidget {
           onPressed: () => Navigator.maybePop(context),
         ),
         title: Text(
-          "Track Order",
+          isReturn ? "Track Return" : "Track Order",
           style: AppTextStyles.titleLarge.copyWith(
             fontWeight: FontWeight.w800,
             color: const Color(0xFF0F172A),
@@ -74,7 +78,7 @@ class TrackOrderScreen extends StatelessWidget {
                   ),
                   const Gap(20),
 
-                  _buildSectionLabel("Live Progress"),
+                  _buildSectionLabel(isReturn ? "Return Progress" : "Live Progress"),
                   const Gap(12),
 
                   _buildEngageableCard(
@@ -82,15 +86,21 @@ class TrackOrderScreen extends StatelessWidget {
                       vertical: 20,
                       horizontal: 16,
                     ),
-                    child: TrackingCard(orderStatus: orderStatus),
+                    child: TrackingCard(
+                      orderStatus: orderStatus,
+                      statuses: customStatuses ?? (isReturn
+                          ? const ["Return Requested", "Processing", "Pickup Done", "Returned"]
+                          : const ["Pending", "Accepted", "Packed", "Shipped", "Delivered"]),
+                    ),
                   ),
                   const Gap(24),
 
-                  _buildSectionLabel("Delivery Destination"),
+                  _buildSectionLabel(isReturn ? "Pickup Source" : "Delivery Destination"),
                   const Gap(12),
 
                   _buildEngageableCard(
                     child: DeliveryAddressCard(
+                      title: isReturn ? "Pickup Address" : "Delivery Address",
                       recipientName: "John Doe",
                       address: "221B Baker Street,\nLondon,\nUnited Kingdom",
                     ),
@@ -128,20 +138,20 @@ class TrackOrderScreen extends StatelessWidget {
   }) {
     return Container(
       width: double.infinity,
-      padding: padding ?? const EdgeInsets.all(4),
+      padding: padding ?? const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFFEDF2F7), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0F172A).withOpacity(0.03),
+            color: const Color(0xFF0F172A).withValues(alpha: 0.03),
             blurRadius: 16,
-            offset: const Offset(0, 8),
+            offset: const Offset(0, 6),
           ),
         ],
       ),
-      child: ClipRRect(borderRadius: BorderRadius.circular(22), child: child),
+      child: child,
     );
   }
 
@@ -210,7 +220,7 @@ class TrackOrderScreen extends StatelessWidget {
                           ),
                           const Gap(8),
                           Text(
-                            'Refresh Live Status',
+                            isReturn ? 'Refresh Return Status' : 'Refresh Live Status',
                             style: AppTextStyles.titleMedium.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,

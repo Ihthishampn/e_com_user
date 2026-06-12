@@ -27,14 +27,10 @@ class AuthRepoImpl implements AuthRepository {
   }
 
   @override
-  Future<String> sendOtp({
-    required String phone,
-  }) async {
+  Future<String> sendOtp({required String phone}) async {
     final identifier = _formatPhone(phone);
 
-    final response = await OTPWidget.sendOTP({
-      'identifier': identifier,
-    });
+    final response = await OTPWidget.sendOTP({'identifier': identifier});
 
     log("OTP SEND RESPONSE => $response");
 
@@ -48,14 +44,8 @@ class AuthRepoImpl implements AuthRepository {
   }
 
   @override
-  Future<bool> verifyOtp({
-    required String reqId,
-    required String otp,
-  }) async {
-    final response = await OTPWidget.verifyOTP({
-      'reqId': reqId,
-      'otp': otp,
-    });
+  Future<bool> verifyOtp({required String reqId, required String otp}) async {
+    final response = await OTPWidget.verifyOTP({'reqId': reqId, 'otp': otp});
 
     log("OTP VERIFY RESPONSE => $response");
 
@@ -65,9 +55,7 @@ class AuthRepoImpl implements AuthRepository {
   }
 
   @override
-  Future<bool> retryOtp({
-    required String reqId,
-  }) async {
+  Future<bool> retryOtp({required String reqId}) async {
     final response = await OTPWidget.retryOTP({
       'reqId': reqId,
       'retryChannel': 11,
@@ -81,40 +69,25 @@ class AuthRepoImpl implements AuthRepository {
   }
 
   @override
-  Future<void> saveUser({
-    required UserModel user,
-  }) async {
-    await firestore
-        .collection('users')
-        .doc(user.number)
-        .set(user.toMap());
+  Future<void> saveUser({required UserModel user}) async {
+    await firestore.collection('users').doc(user.number).set(user.toMap());
 
     log("USER SAVED => ${user.number}");
   }
 
   @override
-  Future<bool> isUserExist({
-    required String phone,
-  }) async {
-    final doc = await firestore
-        .collection('users')
-        .doc(phone)
-        .get();
+  Future<bool> isUserExist({required String phone}) async {
+    final doc = await firestore.collection('users').doc(phone).get();
 
     return doc.exists;
   }
 
   @override
-  Future<UserModel?> getUser({
-    required String phone,
-  }) async {
-    final doc = await firestore
-        .collection('users')
-        .doc(phone)
-        .get();
+  Future<UserModel?> getUser({required String phone}) async {
+    final doc = await firestore.collection('users').doc(phone).get();
 
     if (!doc.exists) return null;
 
-    return UserModel.fromMap(doc.data()!,doc.id);
+    return UserModel.fromMap(doc.data()!, doc.id);
   }
 }

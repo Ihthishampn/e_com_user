@@ -38,7 +38,6 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // Using a Consumer here ensures scroll-triggered color updates don't rebuild the entire screen grid below
           Consumer<HomeProvider>(
             builder: (context, homeProv, child) {
               return SliverAppBar(
@@ -52,7 +51,9 @@ class HomeScreen extends StatelessWidget {
 
                 title: Row(
                   children: [
-                    Expanded(child: AppSearchBar(isCollapsed: homeProv.isCollapsed)),
+                    Expanded(
+                      child: AppSearchBar(isCollapsed: homeProv.isCollapsed),
+                    ),
                     const SizedBox(width: 10),
                     HomeAppBarActions(isCollapsed: homeProv.isCollapsed),
                   ],
@@ -62,9 +63,9 @@ class HomeScreen extends StatelessWidget {
                   builder: (context, constraints) {
                     final topPadding = MediaQuery.of(context).padding.top;
                     final collapsed =
-                        constraints.biggest.height <= kToolbarHeight + topPadding;
+                        constraints.biggest.height <=
+                        kToolbarHeight + topPadding;
 
-                    // Safely schedules updates to the layout tree during state notification cycles
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       context.read<HomeProvider>().setCollapsed(collapsed);
                     });
@@ -121,6 +122,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
+          const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
       ),
     );

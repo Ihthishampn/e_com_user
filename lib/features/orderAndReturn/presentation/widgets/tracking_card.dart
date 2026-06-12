@@ -23,23 +23,16 @@ class TrackingCard extends StatelessWidget {
       (e) => e.toLowerCase() == orderStatus.toLowerCase(),
     );
 
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Column(
-        children: List.generate(statuses.length, (index) {
-          final completed = index <= currentIndex;
+    return Column(
+      children: List.generate(statuses.length, (index) {
+        final completed = index <= currentIndex;
 
-          return TimelineTile(
-            title: statuses[index],
-            isCompleted: completed,
-            isLast: index == statuses.length - 1,
-          );
-        }),
-      ),
+        return TimelineTile(
+          title: statuses[index],
+          isCompleted: completed,
+          isLast: index == statuses.length - 1,
+        );
+      }),
     );
   }
 }

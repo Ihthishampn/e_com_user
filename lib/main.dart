@@ -71,3 +71,22 @@ class EcomUserApp extends StatelessWidget {
     );
   }
 }
+
+// import 'package:e_com_user/features/Cart/presentation/widgets/add_address_button.dart';
+// import 'package:e_com_user/features/Profile/presentation/view/profile_screen.dart';
+// import 'package:e_com_user/features/orderAndReturn/presentation/view/order_and_return_screen.dart';
+// import 'package:e_com_user/features/orderAndReturn/presentation/view/track_order_screen.dart';
+// import 'package:flutter/material.dart';
+
+// void main() {
+//   runApp(APp());
+// }
+
+// class APp extends StatelessWidget {
+//   const APp({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return const MaterialApp(home: ProfileScreen());
+//   }
+// }

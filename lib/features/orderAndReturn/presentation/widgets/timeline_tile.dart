@@ -27,23 +27,34 @@ class TimelineTile extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isCompleted
                       ? AppColors.primaryColor
-                      : Colors.grey.shade300,
+                      : const Color(0xFFE2E8F0),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  isCompleted ? Icons.check : Icons.circle,
-                  size: 14,
-                  color: Colors.white,
-                ),
+                child: isCompleted
+                    ? const Icon(
+                        Icons.check_rounded,
+                        size: 14,
+                        color: Colors.white,
+                      )
+                    : Center(
+                        child: Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
               ),
               if (!isLast)
                 Expanded(
                   child: Container(
                     width: 2,
-                    margin: const EdgeInsets.symmetric(vertical: 2),
+                    margin: const EdgeInsets.symmetric(vertical: 4),
                     color: isCompleted
                         ? AppColors.primaryColor
-                        : Colors.grey.shade300,
+                        : const Color(0xFFE2E8F0),
                   ),
                 ),
             ],
@@ -57,12 +68,13 @@ class TimelineTile extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: AppTextStyles.titleSmall.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: isCompleted ? AppColors.primaryColor : Colors.grey,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: isCompleted ? FontWeight.bold : FontWeight.w500,
+                      color: isCompleted ? const Color(0xFF0F172A) : const Color(0xFF64748B),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 28),
                 ],
               ),
             ),

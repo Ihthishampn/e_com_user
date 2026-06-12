@@ -14,44 +14,45 @@ class OrderInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Row(
-        children: [
-          Container(
-            height: 70,
-            width: 70,
-            decoration: BoxDecoration(
-              color: AppColors.lightBlue,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(Icons.inventory_2_outlined, size: 35),
+    return Row(
+      children: [
+        Container(
+          height: 64,
+          width: 64,
+          decoration: BoxDecoration(
+            color: AppColors.primaryColor.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(14),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  productName,
-                  style: AppTextStyles.titleMedium.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  "Order ID : $orderId",
-                  style: AppTextStyles.bodySmall.copyWith(color: Colors.grey),
-                ),
-              ],
-            ),
+          child: Icon(
+            Icons.inventory_2_outlined,
+            size: 28,
+            color: AppColors.primaryColor,
           ),
-        ],
-      ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                productName,
+                style: AppTextStyles.titleMedium.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF0F172A),
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                "Order ID : $orderId",
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: const Color(0xFF64748B),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

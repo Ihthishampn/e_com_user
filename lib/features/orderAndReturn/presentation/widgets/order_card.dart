@@ -24,13 +24,18 @@ class OrderCard extends StatelessWidget {
     const primaryColor = Color.fromARGB(255, 50, 43, 150);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFEDF2F7), width: 1.5),
         boxShadow: [
-          BoxShadow(color: Colors.grey.withOpacity(.06), blurRadius: 8),
+          BoxShadow(
+            color: const Color(0xFF0F172A).withValues(alpha: 0.03),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
         ],
       ),
       child: Column(
@@ -39,18 +44,18 @@ class OrderCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
                 child: image.startsWith('http')
                     ? Image.network(
                         image,
-                        width: 56,
-                        height: 56,
+                        width: 60,
+                        height: 60,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
-                            width: 56,
-                            height: 56,
-                            color: Colors.grey.shade200,
+                            width: 60,
+                            height: 60,
+                            color: const Color(0xFFF1F5F9),
                             child: const Icon(
                               Icons.image_not_supported_outlined,
                               size: 24,
@@ -60,9 +65,9 @@ class OrderCard extends StatelessWidget {
                         },
                       )
                     : Container(
-                        width: 56,
-                        height: 56,
-                        color: Colors.grey.shade200,
+                        width: 60,
+                        height: 60,
+                        color: const Color(0xFFF1F5F9),
                         child: const Icon(
                           Icons.image_not_supported_outlined,
                           size: 24,
@@ -70,7 +75,7 @@ class OrderCard extends StatelessWidget {
                         ),
                       ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,58 +85,57 @@ class OrderCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: Color(0xFF0F172A),
                       ),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       price,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: primaryColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
                       ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(width: 8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: statusColor.withOpacity(.12),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Text(
-                      status,
-                      style: TextStyle(
-                        color: statusColor,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  status,
+                  style: TextStyle(
+                    color: statusColor,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.1,
                   ),
-                ],
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
                 child: OutlinedButton(
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    foregroundColor: const Color(0xFF475569),
+                    side: const BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     visualDensity: VisualDensity.compact,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                   onPressed: () {
@@ -145,28 +149,44 @@ class OrderCard extends StatelessWidget {
                       ),
                     );
                   },
-                  child: const Text(
-                    'Track Order',
-                    style: TextStyle(fontSize: 13),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.local_shipping_outlined, size: 16),
+                      SizedBox(width: 6),
+                      Text(
+                        'Track Order',
+                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
                 ),
               ),
               if (status == 'Delivered') ...[
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: onReturnPressed,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: primaryColor,
-                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      backgroundColor: primaryColor.withValues(alpha: 0.08),
+                      foregroundColor: primaryColor,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                       visualDensity: VisualDensity.compact,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      'Return',
-                      style: TextStyle(color: Colors.white, fontSize: 13),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.keyboard_return_rounded, size: 16),
+                        SizedBox(width: 6),
+                        Text(
+                          'Return',
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                        ),
+                      ],
                     ),
                   ),
                 ),

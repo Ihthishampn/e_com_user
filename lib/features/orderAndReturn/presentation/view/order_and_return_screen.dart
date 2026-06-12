@@ -64,23 +64,19 @@ class _OrderAndReturnScreenState extends State<OrderAndReturnScreen>
   Color statusColor(String status) {
     switch (status.toLowerCase()) {
       case "delivered":
-        return Colors.green;
-      case "shipped":
-        return Colors.orange;
-      case "packed":
-        return Colors.blue;
-      case "accepted":
-        return Colors.indigo;
-      case "cancelled":
-        return Colors.red;
-      case "rejected":
-        return Colors.red;
-      case "processing":
-        return Colors.orange;
       case "returned":
-        return Colors.green;
+        return const Color(0xFF16A34A);
+      case "shipped":
+      case "processing":
+        return const Color(0xFFEA580C);
+      case "packed":
+      case "accepted":
+        return const Color(0xFF2563EB);
+      case "cancelled":
+      case "rejected":
+        return const Color(0xFFDC2626);
       default:
-        return Colors.grey;
+        return const Color(0xFF64748B);
     }
   }
 
@@ -89,8 +85,7 @@ class _OrderAndReturnScreenState extends State<OrderAndReturnScreen>
     const primaryColor = Color.fromARGB(255, 50, 43, 150);
 
     return Scaffold(
-      // backgroundColor: const Color.fromARGB(255, 31, 58, 111),
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
@@ -98,17 +93,42 @@ class _OrderAndReturnScreenState extends State<OrderAndReturnScreen>
         scrolledUnderElevation: 0,
         title: const Text(
           "Orders & Returns",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.5),
         ),
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: primaryColor,
-          labelColor: primaryColor,
-          unselectedLabelColor: Colors.grey,
-          tabs: const [
-            Tab(text: "Orders"),
-            Tab(text: "Returns"),
-          ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60),
+          child: Container(
+            height: 46,
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF1F5F9),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: TabBar(
+              controller: _tabController,
+              indicatorSize: TabBarIndicatorSize.tab,
+              dividerColor: Colors.transparent,
+              indicator: BoxDecoration(
+                color: primaryColor,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: primaryColor.withValues(alpha: 0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              labelColor: Colors.white,
+              unselectedLabelColor: const Color(0xFF64748B),
+              labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+              tabs: const [
+                Tab(text: "Orders"),
+                Tab(text: "Returns"),
+              ],
+            ),
+          ),
         ),
       ),
       body: TabBarView(

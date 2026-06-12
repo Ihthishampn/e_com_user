@@ -242,6 +242,7 @@ class CategoryScreen extends StatelessWidget {
                                 child: Text('No products in this category'),
                               )
                             : GridView.builder(
+                                padding: const EdgeInsets.only(bottom: 70),
                                 itemCount: productsForCategory.length,
                                 gridDelegate:
                                     const SliverGridDelegateWithFixedCrossAxisCount(
