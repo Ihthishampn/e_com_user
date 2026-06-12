@@ -1,16 +1,20 @@
 import 'package:e_com_user/general/utils/themes/app_colors.dart';
 import 'package:e_com_user/general/utils/themes/app_text_style.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-class ProfileTextField extends StatelessWidget {
+class AddressTextField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
   final String hint;
   final IconData icon;
   final int maxLines;
   final TextInputType keyboardType;
+  final int? maxDigits;
+  final String? Function(String?)? validator;
+  final List<TextInputFormatter>? inputFormatters;
 
-  const ProfileTextField({
+  const AddressTextField({
     super.key,
     required this.controller,
     required this.label,
@@ -18,6 +22,9 @@ class ProfileTextField extends StatelessWidget {
     required this.icon,
     this.maxLines = 1,
     this.keyboardType = TextInputType.text,
+    this.maxDigits,
+    this.validator,
+    this.inputFormatters,
   });
 
   @override
@@ -42,6 +49,8 @@ class ProfileTextField extends StatelessWidget {
           maxLines: maxLines,
           style: const TextStyle(color: Colors.white, fontSize: 16),
           cursorColor: AppColors.primaryColor,
+          inputFormatters: _buildInputFormatters(),
+          validator: validator,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(color: Color(0xFF64748B), fontSize: 14),
@@ -50,6 +59,7 @@ class ProfileTextField extends StatelessWidget {
             fillColor: const Color(0xFF1E293B),
             contentPadding: const EdgeInsets.all(18),
             alignLabelWithHint: true,
+
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide.none,
@@ -66,5 +76,20 @@ class ProfileTextField extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  List<TextInputFormatter>? _buildInputFormatters() {
+    final List<TextInputFormatter> list = [];
+    if (inputFormatters != null && inputFormatters!.isNotEmpty) {
+      list.addAll(inputFormatters!);
+    }
+
+    // If maxDigits is provided, restrict to digits only and limit length.
+    if (maxDigits != null && maxDigits! > 0) {
+      list.add(FilteringTextInputFormatter.digitsOnly);
+      list.add(LengthLimitingTextInputFormatter(maxDigits));
+    }
+
+    return list.isEmpty ? null : list;
   }
 }

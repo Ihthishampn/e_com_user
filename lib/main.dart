@@ -1,4 +1,6 @@
+import 'package:e_com_user/features/Address/presentation/provider/address_provider.dart';
 import 'package:e_com_user/features/Auth/presentation/provider/auth_provider.dart';
+import 'package:e_com_user/features/Cart/presentation/provider/cart_provider.dart';
 import 'package:e_com_user/features/Category/presentation/provider/category_provider.dart';
 import 'package:e_com_user/features/Home/presentation/provider/home_provider.dart';
 import 'package:e_com_user/features/Home/presentation/provider/product_provider.dart';
@@ -48,6 +50,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => getIt<CategoryProvider>()),
         ChangeNotifierProvider(create: (_) => getIt<ProductProvider>()),
         ChangeNotifierProvider(create: (_) => getIt<FavProvider>()),
+        ChangeNotifierProvider(create: (_) => getIt<AddressProvider>()),
+        ChangeNotifierProvider(create: (_) => getIt<CartProvider>()),
         ChangeNotifierProvider(create: (_) => HomeProvider()),
       ],
       child: EcomUserApp(router: router),

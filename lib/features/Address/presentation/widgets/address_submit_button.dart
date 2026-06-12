@@ -1,16 +1,18 @@
 import 'package:e_com_user/general/utils/themes/app_text_style.dart';
 import 'package:flutter/material.dart';
 
-class ProfileSubmitButton extends StatelessWidget {
+class AddressSubmitButton extends StatelessWidget {
   final bool enabled;
   final VoidCallback onPressed;
   final Color primaryAccent;
+  final bool isLoading;
 
-  const ProfileSubmitButton({
+  const AddressSubmitButton({
     super.key,
     required this.enabled,
     required this.onPressed,
     required this.primaryAccent,
+    this.isLoading = false,
   });
 
   @override
@@ -44,14 +46,23 @@ class ProfileSubmitButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
           ),
         ),
-        onPressed: onPressed,
-        child: Text(
-          'Secure Address',
-          style: AppTextStyles.titleMedium.copyWith(
-            color: enabled ? Colors.white : Colors.white38,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
+        onPressed: (enabled && !isLoading) ? onPressed : null,
+        child: isLoading
+            ? SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Text(
+                'Secure Address',
+                style: AppTextStyles.titleMedium.copyWith(
+                  color: enabled ? Colors.white : Colors.white38,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
       ),
     );
   }

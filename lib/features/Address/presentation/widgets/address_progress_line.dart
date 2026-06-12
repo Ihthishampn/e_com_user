@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class ProfileProgressLine extends StatelessWidget {
+class AddressProgressLine extends StatelessWidget {
   final double progress;
   final Color primaryAccent;
 
-  const ProfileProgressLine({
+  const AddressProgressLine({
     super.key,
     required this.progress,
     required this.primaryAccent,

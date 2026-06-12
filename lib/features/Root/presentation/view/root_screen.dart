@@ -1,7 +1,7 @@
 import 'package:e_com_user/features/Cart/presentation/view/cart_screen.dart';
 import 'package:e_com_user/features/Category/presentation/view/category_screen.dart';
 import 'package:e_com_user/features/Home/presentation/view/home_screen.dart';
-import 'package:e_com_user/features/Profile/presentation/view/profile_screen.dart';
+import 'package:e_com_user/features/Address/presentation/view/address_screen.dart';
 import 'package:e_com_user/features/orderAndReturn/presentation/view/order_and_return_screen.dart';
 import 'package:e_com_user/general/utils/themes/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +22,7 @@ class _RootScreenState extends State<RootScreen> {
     const CategoryScreen(),
     const CartScreen(),
     const OrderAndReturnScreen(),
-    const ProfileScreen(),
+    const AddressScreen(),
   ];
 
   @override

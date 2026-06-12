@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:e_com_user/features/Profile/presentation/widgets/profile_progress_line.dart';
-import 'package:e_com_user/features/Profile/presentation/widgets/profile_submit_button.dart';
-import 'package:e_com_user/features/Profile/presentation/widgets/profile_text_field.dart';
+import 'package:e_com_user/features/Address/presentation/widgets/address_progress_line.dart';
+import 'package:e_com_user/features/Address/presentation/widgets/address_submit_button.dart';
+import 'package:e_com_user/features/Address/presentation/widgets/address_text_field.dart';
 import 'package:e_com_user/general/utils/themes/app_colors.dart';
 import 'package:e_com_user/general/utils/themes/app_text_style.dart';
 import 'package:gap/gap.dart';
@@ -78,7 +78,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       body: Stack(
         children: [
-          ProfileProgressLine(
+          AddressProgressLine(
             progress: _formProgress,
             primaryAccent: primaryAccent,
           ),
@@ -89,14 +89,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
               child: Column(
                 children: [
-                  ProfileTextField(
+                  AddressTextField(
                     controller: _nameController,
                     label: 'Full Name',
                     hint: 'What should we call you?',
                     icon: Icons.person_rounded,
                   ),
                   const Gap(20),
-                  ProfileTextField(
+                  AddressTextField(
                     controller: _phoneController,
                     label: 'Phone Number',
                     hint: 'For delivery updates',
@@ -104,7 +104,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     keyboardType: TextInputType.phone,
                   ),
                   const Gap(20),
-                  ProfileTextField(
+                  AddressTextField(
                     controller: _addressController,
                     label: 'Address',
                     hint: 'House No, Street, Local Area',
@@ -112,14 +112,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     maxLines: 3,
                   ),
                   const Gap(20),
-                  ProfileTextField(
+                  AddressTextField(
                     controller: _landmarkController,
                     label: 'Landmark (Optional)',
                     hint: 'Spot nearest to you',
                     icon: Icons.explore_rounded,
                   ),
                   const Gap(20),
-                  ProfileTextField(
+                  AddressTextField(
                     controller: _notesController,
                     label: 'Notes (Optional)',
                     hint: 'Drop it at the door, ring bell, etc.',
@@ -127,7 +127,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     maxLines: 2,
                   ),
                   const Gap(40),
-                  ProfileSubmitButton(
+                  AddressSubmitButton(
                     enabled: _formProgress > 0.4,
                     primaryAccent: primaryAccent,
                     onPressed: () {

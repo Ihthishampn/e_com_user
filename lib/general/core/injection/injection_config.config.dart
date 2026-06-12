@@ -11,6 +11,14 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:cloud_firestore/cloud_firestore.dart' as _i974;
 import 'package:dio/dio.dart' as _i361;
+import 'package:e_com_user/features/Address/data/repo_impl/address_repo_imple.dart'
+    as _i347;
+import 'package:e_com_user/features/Address/data/use_case/address_use_case.dart'
+    as _i43;
+import 'package:e_com_user/features/Address/domain/repo/address_repo.dart'
+    as _i377;
+import 'package:e_com_user/features/Address/presentation/provider/address_provider.dart'
+    as _i980;
 import 'package:e_com_user/features/Auth/data/repo_impl/auth_repo_impl.dart'
     as _i452;
 import 'package:e_com_user/features/Auth/data/use_case/auth_use_case.dart'
@@ -19,6 +27,13 @@ import 'package:e_com_user/features/Auth/domain/repository/auth_repository.dart'
     as _i1005;
 import 'package:e_com_user/features/Auth/presentation/provider/auth_provider.dart'
     as _i4;
+import 'package:e_com_user/features/Cart/data/repo_impl/cart_repo_impl.dart'
+    as _i750;
+import 'package:e_com_user/features/Cart/data/use_case/cart_use_case.dart'
+    as _i675;
+import 'package:e_com_user/features/Cart/domain/repo/cart_repo.dart' as _i386;
+import 'package:e_com_user/features/Cart/presentation/provider/cart_provider.dart'
+    as _i89;
 import 'package:e_com_user/features/Category/data/repo_impl/category_repo_impl.dart'
     as _i1;
 import 'package:e_com_user/features/Category/data/use_case/category_use_case.dart'
@@ -60,6 +75,7 @@ extension GetItInjectableX on _i174.GetIt {
     final preferenceModule = _$PreferenceModule();
     final dioModule = _$DioModule();
     final firebaseModule = _$FirebaseModule();
+    gh.factory<_i89.CartProvider>(() => _i89.CartProvider());
     await gh.factoryAsync<_i460.SharedPreferences>(
       () => preferenceModule.sharedPreferences(),
       preResolve: true,
@@ -67,6 +83,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i361.Dio>(() => dioModule.dio());
     gh.lazySingleton<_i974.FirebaseFirestore>(
       () => firebaseModule.firebaseFirestore(),
+    );
+    gh.lazySingleton<_i43.AddressUseCase>(
+      () => _i43.AddressUseCase(gh<_i974.FirebaseFirestore>()),
+    );
+    gh.lazySingleton<_i675.CartUseCase>(
+      () => _i675.CartUseCase(gh<_i974.FirebaseFirestore>()),
     );
     gh.lazySingleton<_i372.CategoryUseCase>(
       () => _i372.CategoryUseCase(gh<_i974.FirebaseFirestore>()),
@@ -83,11 +105,17 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i905.CategoryRepo>(
       () => _i1.CategoryRepoImpl(gh<_i372.CategoryUseCase>()),
     );
+    gh.lazySingleton<_i386.CartRepo>(
+      () => _i750.CartRepoImpl(gh<_i675.CartUseCase>()),
+    );
     gh.lazySingleton<_i460.FavRepo>(
       () => _i313.FavouriteRepoImpl(gh<_i496.FavUseCase>()),
     );
     gh.singleton<_i585.AppPreferences>(
       () => preferenceModule.appPreferences(gh<_i460.SharedPreferences>()),
+    );
+    gh.lazySingleton<_i377.AddressRepo>(
+      () => _i347.AddressRepoImple(gh<_i43.AddressUseCase>()),
     );
     gh.lazySingleton<_i1005.AuthRepository>(
       () => _i452.AuthRepoImpl(gh<_i974.FirebaseFirestore>()),
@@ -95,6 +123,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i963.FavProvider>(() => _i963.FavProvider(gh<_i460.FavRepo>()));
     gh.lazySingleton<_i273.AuthUseCase>(
       () => _i273.AuthUseCase(gh<_i1005.AuthRepository>()),
+    );
+    gh.factory<_i980.AddressProvider>(
+      () => _i980.AddressProvider(gh<_i377.AddressRepo>()),
     );
     gh.factory<_i4.AuthProvider>(
       () =>
