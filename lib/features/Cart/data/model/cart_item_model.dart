@@ -31,9 +31,9 @@ class CartItemModel {
 
   double get totalItemPrice => quantity * productPrice;
 
-  factory CartItemModel.fromJson(Map<String, dynamic> json) {
+  factory CartItemModel.fromJson(Map<String, dynamic> json,String id) {
     return CartItemModel(
-      productId: json['productId'],
+      productId: id,
       productName: json['productName'],
       quantity: json['quantity'],
       productPrice: (json['productPrice'] as num).toDouble(),

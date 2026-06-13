@@ -75,7 +75,6 @@ extension GetItInjectableX on _i174.GetIt {
     final preferenceModule = _$PreferenceModule();
     final dioModule = _$DioModule();
     final firebaseModule = _$FirebaseModule();
-    gh.factory<_i89.CartProvider>(() => _i89.CartProvider());
     await gh.factoryAsync<_i460.SharedPreferences>(
       () => preferenceModule.sharedPreferences(),
       preResolve: true,
@@ -119,6 +118,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i1005.AuthRepository>(
       () => _i452.AuthRepoImpl(gh<_i974.FirebaseFirestore>()),
+    );
+    gh.factory<_i89.CartProvider>(
+      () => _i89.CartProvider(gh<_i386.CartRepo>()),
     );
     gh.factory<_i963.FavProvider>(() => _i963.FavProvider(gh<_i460.FavRepo>()));
     gh.lazySingleton<_i273.AuthUseCase>(

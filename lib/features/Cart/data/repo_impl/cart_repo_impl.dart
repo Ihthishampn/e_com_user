@@ -7,39 +7,41 @@ import 'package:injectable/injectable.dart';
 class CartRepoImpl implements CartRepo {
   final CartUseCase remote;
   CartRepoImpl(this.remote);
+
   @override
-  Future<CartItemModel> addToCart() {
-    // TODO: implement addToCart
-    throw UnimplementedError();
+  Future<void> addToCart({required CartItemModel cartItem}) async {
+    return await remote.addToCart(cartItem: cartItem);
   }
 
   @override
-  Future<void> clearCart() {
-    // TODO: implement clearCart
-    throw UnimplementedError();
+  Future<void> clearCart() async{
+    return await remote.clearCart();
+  
   }
 
   @override
-  Future<void> decrementQuantity() {
-    // TODO: implement decrementQuantity
-    throw UnimplementedError();
+  Future<void> decreaseQuantity({required String productId}) async{
+     return await remote.decrementQuantity(productId: productId);
+
   }
 
   @override
-  Future<List<CartItemModel>> fetchCart() {
-    // TODO: implement fetchCart
-    throw UnimplementedError();
+  Future<List<CartItemModel>> fetchCart()async {
+    return await remote.fetchCart();
+
   }
 
   @override
-  Future<void> increaseQuantiy() {
-    // TODO: implement increaseQuantiy
-    throw UnimplementedError();
+  Future<void> increaseQuantity({required String productId}) async{
+       return await remote.increaseQuantiy(porductId: productId);
+
   }
 
   @override
-  Future<void> removeFromCart() {
-    // TODO: implement removeFromCart
-    throw UnimplementedError();
+  Future<void> removeFromCart({required String productId}) async{   
+        return await remote.removeFromCart(productId: productId);
+
   }
+
+
 }
