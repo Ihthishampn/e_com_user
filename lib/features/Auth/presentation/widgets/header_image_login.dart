@@ -14,7 +14,7 @@ class HeaderImageLogin extends StatelessWidget {
           borderRadius: BorderRadius.circular(22),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.06),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 18,
               offset: const Offset(0, 8),
             ),
@@ -26,6 +26,7 @@ class HeaderImageLogin extends StatelessWidget {
             "assets/images/ecom_login_image.jpg",
             width: 210,
             height: 170,
+            
             fit: BoxFit.cover,
           ),
         ),

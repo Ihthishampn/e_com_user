@@ -31,7 +31,7 @@ class AddressProgressLine extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: primaryAccent.withOpacity(0.5),
+                color: primaryAccent.withValues(alpha: 0.5),
                 blurRadius: 8,
                 spreadRadius: 1,
               ),

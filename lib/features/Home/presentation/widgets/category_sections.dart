@@ -96,7 +96,7 @@ class CategorySection extends StatelessWidget {
                                   ? [
                                       BoxShadow(
                                         color: AppColors.primaryColor
-                                            .withOpacity(0.22),
+                                            .withValues(alpha: 0.22),
                                         blurRadius: 8,
                                         offset: const Offset(0, 4),
                                       ),
@@ -106,7 +106,7 @@ class CategorySection extends StatelessWidget {
                                   ? LinearGradient(
                                       colors: [
                                         AppColors.primaryColor,
-                                        AppColors.primaryColor.withOpacity(0.9),
+                                        AppColors.primaryColor.withValues(alpha: 0.9),
                                       ],
                                     )
                                   : null,

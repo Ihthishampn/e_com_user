@@ -4,4 +4,5 @@ class RouteNames {
   static const String otp = "/otp";
   static const String root = "/root";
   static const String fav = "/fav";
+  static const String cart = "/cart";
 }

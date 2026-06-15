@@ -16,6 +16,7 @@ class AddressSubmitButton extends StatelessWidget {
   });
 
   @override
+  
   Widget build(BuildContext context) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
@@ -31,7 +32,7 @@ class AddressSubmitButton extends StatelessWidget {
         boxShadow: enabled
             ? [
                 BoxShadow(
-                  color: primaryAccent.withOpacity(0.4),
+                  color: primaryAccent.withValues(alpha: 0.4),
                   blurRadius: 16,
                   offset: const Offset(0, 6),
                 ),

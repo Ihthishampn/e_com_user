@@ -1,17 +1,49 @@
+import 'package:e_com_user/features/Address/presentation/provider/address_provider.dart';
+import 'package:e_com_user/features/Cart/data/model/cart_item_model.dart';
+import 'package:e_com_user/features/Cart/presentation/provider/cart_provider.dart';
 import 'package:e_com_user/features/Cart/presentation/widgets/address_list.dart';
-import 'package:e_com_user/features/Cart/presentation/widgets/checkout_summary.dart';
 import 'package:e_com_user/features/Cart/presentation/widgets/cart_item_widget.dart';
+import 'package:e_com_user/features/Cart/presentation/widgets/check_out_sunmmury.dart';
+import 'package:e_com_user/general/utils/enums/app_state.dart';
 import 'package:e_com_user/general/utils/themes/app_text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:provider/provider.dart';
 
-class CheckoutScreen extends StatelessWidget {
-  final List<Map<String, dynamic>> items;
+class CheckoutScreen extends StatefulWidget {
+  final List<CartItemModel> cartItems;
 
-  const CheckoutScreen({super.key, required this.items});
+  const CheckoutScreen({super.key, required this.cartItems});
+
+  @override
+  State<CheckoutScreen> createState() => _CheckoutScreenState();
+}
+
+class _CheckoutScreenState extends State<CheckoutScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final addressProvider = context.read<AddressProvider>();
+      if (addressProvider.fetchState != AppState.loading) {
+        addressProvider.fetchAddress();
+      }
+    });
+  }
+
+  double _calculateSubtotal() {
+    return widget.cartItems.fold(
+      0,
+      (sum, item) => sum + (item.productPrice * item.quantity),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final subtotal = _calculateSubtotal();
+    const delivery = 40.0;
+    final total = subtotal + delivery;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -51,7 +83,7 @@ class CheckoutScreen extends StatelessWidget {
                   _buildSectionHeader(
                     title: 'Review Order',
                     trailingText:
-                        '${items.length} ${items.length == 1 ? 'item' : 'items'}',
+                        '${widget.cartItems.length} ${widget.cartItems.length == 1 ? 'item' : 'items'}',
                   ),
                   const Gap(12),
 
@@ -71,21 +103,21 @@ class CheckoutScreen extends StatelessWidget {
                     child: ListView.separated(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: items.length,
-                      separatorBuilder: (_, __) => const Padding(
+                      itemCount: widget.cartItems.length,
+                      separatorBuilder: (_, _) => const Padding(
                         padding: EdgeInsets.symmetric(vertical: 4),
                         child: Divider(color: Color(0xFFE2E8F0), height: 1),
                       ),
                       itemBuilder: (context, index) {
-                        final it = items[index];
+                        final item = widget.cartItems[index];
                         return CartItemWidget(
                           isCartScreen: false,
-                          onDecrement: (){},
-                          onIncrement:(){},
-                          name: it['name'] as String,
-                          price: it['price'] as String,
-                          image: it['image'] as String,
-                          quantity: it['qty'] as int,
+                          onDecrement: () {},
+                          onIncrement: () {},
+                          name: item.productName,
+                          price: '₹${item.productPrice.toStringAsFixed(0)}',
+                          image: item.imageUrl,
+                          quantity: item.quantity,
                         );
                       },
                     ),
@@ -93,16 +125,12 @@ class CheckoutScreen extends StatelessWidget {
 
                   const Gap(28),
 
-                  // Section Headline: Delivery Destination
                   _buildSectionHeader(title: 'Delivery Address'),
                   const Gap(12),
-
-                  // Injected Address Interface Component
                   const AddressList(),
 
                   const Gap(28),
 
-                  // Section Headline: Cost Accounting Breakdown
                   _buildSectionHeader(title: 'Payment Summary'),
                   const Gap(12),
 
@@ -116,7 +144,7 @@ class CheckoutScreen extends StatelessWidget {
                       ),
                     ),
                     padding: const EdgeInsets.all(16),
-                    child: CheckoutSummary(items: items),
+                    child: CheckoutSummary(cartItems: widget.cartItems),
                   ),
                   const Gap(40),
                 ],
@@ -125,7 +153,7 @@ class CheckoutScreen extends StatelessWidget {
           ),
 
           // High-Contrast Interactive Checkout Sticky Dock
-          _buildActionStickyDock(context),
+          _buildActionStickyDock(context, total),
         ],
       ),
     );
@@ -157,7 +185,10 @@ class CheckoutScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActionStickyDock(BuildContext context) {
+  Widget _buildActionStickyDock(BuildContext context, double total) {
+    final addressProvider = context.watch<AddressProvider>();
+    final hasSelectedAddress = addressProvider.selectedAddress != null;
+
     return Container(
       padding: EdgeInsets.only(
         left: 24,
@@ -173,7 +204,7 @@ class CheckoutScreen extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0F172A).withOpacity(0.06),
+            color: const Color(0xFF0F172A).withValues(alpha: 0.06),
             blurRadius: 24,
             offset: const Offset(0, -4),
           ),
@@ -181,7 +212,6 @@ class CheckoutScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Dynamic pricing feedback element
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -197,8 +227,7 @@ class CheckoutScreen extends StatelessWidget {
               ),
               const Gap(2),
               Text(
-                // Safely calculates dynamic pricing layout or falls back smoothly
-                items.isNotEmpty ? '${items[0]['price']}' : '\$0.00',
+                '₹${total.toStringAsFixed(0)}',
                 style: AppTextStyles.headlineSmall.copyWith(
                   fontWeight: FontWeight.w800,
                   color: const Color(0xFF0F172A),
@@ -215,9 +244,9 @@ class CheckoutScreen extends StatelessWidget {
               height: 56,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(
-                    0xFF10B981,
-                  ), // Vibrant Green Accent
+                  backgroundColor: hasSelectedAddress
+                      ? const Color(0xFF10B981)
+                      : const Color(0xFF94A3B8),
                   foregroundColor: Colors.white,
                   elevation: 0,
                   shadowColor: Colors.transparent,
@@ -225,9 +254,18 @@ class CheckoutScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
-                onPressed: () {
-                  // Direct to integrated secure transaction gateway arrays
-                },
+                onPressed: hasSelectedAddress
+                    ? () {
+                        _showPaymentMethodBottomSheet(context, total);
+                      }
+                    : () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Please select a delivery address first.'),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -252,6 +290,380 @@ class CheckoutScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showPaymentMethodBottomSheet(BuildContext context, double total) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
+      ),
+      builder: (context) {
+        return Consumer<CartProvider>(
+          builder: (context, cartProvider, child) {
+            final selectedMethod = cartProvider.selectedPaymentMethod;
+
+            return SafeArea(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.only(
+                  left: 24,
+                  right: 24,
+                  top: 16,
+                  bottom: MediaQuery.of(context).padding.bottom + 16,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 48,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const Gap(16),
+                    Text(
+                      'Select Payment Method',
+                      style: AppTextStyles.titleMedium.copyWith(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 18,
+                        color: const Color(0xFF0F172A),
+                      ),
+                    ),
+                    const Gap(16),
+                    _buildPaymentOption(
+                      context: context,
+                      icon: Icons.payments_outlined,
+                      title: 'Cash on Delivery (COD)',
+                      subtitle: 'Pay with cash upon delivery',
+                      isSelected: selectedMethod == 'Cash on Delivery',
+                      onTap: () {
+                        cartProvider.setPaymentMethod('Cash on Delivery');
+                      },
+                    ),
+                    const Gap(12),
+                    _buildPaymentOption(
+                      context: context,
+                      icon: Icons.account_balance_wallet_outlined,
+                      title: 'UPI (Paytm, PhonePe, Google Pay)',
+                      subtitle: 'Instant transfer using your UPI app',
+                      isSelected: selectedMethod == 'UPI',
+                      onTap: () {
+                        cartProvider.setPaymentMethod('UPI');
+                      },
+                    ),
+                    const Gap(12),
+                    _buildPaymentOption(
+                      context: context,
+                      icon: Icons.credit_card_outlined,
+                      title: 'Credit / Debit Card',
+                      subtitle: 'Visa, Mastercard, RuPay, Maestro',
+                      isSelected: selectedMethod == 'Credit/Debit Card',
+                      onTap: () {
+                        cartProvider.setPaymentMethod('Credit/Debit Card');
+                      },
+                    ),
+                    const Gap(12),
+                    _buildPaymentOption(
+                      context: context,
+                      icon: Icons.account_balance_outlined,
+                      title: 'Net Banking',
+                      subtitle: 'Pay directly from your bank account',
+                      isSelected: selectedMethod == 'Net Banking',
+                      onTap: () {
+                        cartProvider.setPaymentMethod('Net Banking');
+                      },
+                    ),
+                    const Gap(12),
+                    _buildPaymentOption(
+                      context: context,
+                      icon: Icons.wallet_outlined,
+                      title: 'Wallets',
+                      subtitle: 'Amazon Pay, Mobikwik, PhonePe Wallet',
+                      isSelected: selectedMethod == 'Wallet',
+                      onTap: () {
+                        cartProvider.setPaymentMethod('Wallet');
+                      },
+                    ),
+                    const Gap(24),
+                    // Confirm & Pay button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF10B981),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          elevation: 0,
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop(); // Close bottom sheet
+                          // Navigate to payment status loading screen
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => PaymentStatusScreen(
+                                paymentMethod: selectedMethod,
+                                amount: total,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          'Confirm & Pay ₹${total.toStringAsFixed(0)}',
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildPaymentOption({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    const activeColor = Color(0xFF10B981);
+    final borderColor = isSelected ? activeColor : const Color(0xFFE2E8F0);
+    final bgColor = isSelected ? const Color(0xFFECFDF5) : Colors.white;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: bgColor,
+          border: Border.all(color: borderColor, width: isSelected ? 2 : 1),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isSelected ? const Color(0xFFA7F3D0) : const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: isSelected ? activeColor : const Color(0xFF0F172A),
+                size: 22,
+              ),
+            ),
+            const Gap(16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: isSelected ? activeColor : const Color(0xFF0F172A),
+                    ),
+                  ),
+                  const Gap(2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      color: isSelected ? const Color(0xFF059669) : const Color(0xFF64748B),
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (isSelected)
+              const Icon(
+                Icons.check_circle_rounded,
+                color: activeColor,
+              )
+            else
+              const Icon(
+                Icons.circle_outlined,
+                color: Color(0xFF94A3B8),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class PaymentStatusScreen extends StatefulWidget {
+  final String paymentMethod;
+  final double amount;
+
+  const PaymentStatusScreen({
+    super.key,
+    required this.paymentMethod,
+    required this.amount,
+  });
+
+  @override
+  State<PaymentStatusScreen> createState() => _PaymentStatusScreenState();
+}
+
+class _PaymentStatusScreenState extends State<PaymentStatusScreen> {
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _startPaymentSimulation();
+  }
+
+  void _startPaymentSimulation() {
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        // Clear the cart when payment succeeds
+        context.read<CartProvider>().clearCart();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Center(
+            child: _isLoading ? _buildLoadingState() : _buildSuccessState(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingState() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const SizedBox(
+          width: 60,
+          height: 60,
+          child: CircularProgressIndicator(
+            color: Color(0xFF10B981),
+            strokeWidth: 4,
+          ),
+        ),
+        const SizedBox(height: 24),
+        const Text(
+          'Processing Payment...',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF0F172A),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Connecting to secure gateway via ${widget.paymentMethod}',
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 14,
+            color: Color(0xFF64748B),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSuccessState() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: const BoxDecoration(
+            color: Color(0xFFECFDF5),
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.check_circle_rounded,
+            color: Color(0xFF10B981),
+            size: 80,
+          ),
+        ),
+        const SizedBox(height: 24),
+        const Text(
+          'Order Placed Successfully!',
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF0F172A),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Your payment of ₹${widget.amount.toStringAsFixed(0)} via ${widget.paymentMethod} was successful.',
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 14,
+            color: Color(0xFF64748B),
+          ),
+        ),
+        const SizedBox(height: 40),
+        SizedBox(
+          width: double.infinity,
+          height: 50,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF10B981),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 0,
+            ),
+            onPressed: () {
+              // Pop back to the cart screen
+              Navigator.of(context).pop(); // pop status screen
+              Navigator.of(context).pop(); // pop checkout screen
+            },
+            child: const Text(
+              'Back to Cart',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

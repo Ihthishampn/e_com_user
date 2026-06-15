@@ -2,9 +2,9 @@ import 'package:e_com_user/general/utils/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class AddAddressButton extends StatelessWidget {
-  final VoidCallback? onTap;
+  final VoidCallback onTap;
 
-  const AddAddressButton({super.key, this.onTap});
+  const AddAddressButton({super.key, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -22,32 +22,7 @@ class AddAddressButton extends StatelessWidget {
           ),
           backgroundColor: Colors.white,
         ),
-        onPressed: onTap ?? () {
-          showDialog(
-            context: context,
-            builder: (ctx) => AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              title: const Text(
-                'Add Address',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              content: const Text(
-                'This is a demo UI. Add address flow goes here.',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(ctx).pop(),
-                  child: Text(
-                    'Close',
-                    style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
+        onPressed: onTap,
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -63,3 +38,4 @@ class AddAddressButton extends StatelessWidget {
     );
   }
 }
+

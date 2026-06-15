@@ -1,9 +1,12 @@
-import 'package:e_com_user/features/Cart/presentation/view/cart_screen.dart';
 import 'package:e_com_user/features/Category/presentation/view/category_screen.dart';
 import 'package:e_com_user/features/Home/presentation/view/home_screen.dart';
 import 'package:e_com_user/features/Address/presentation/view/address_screen.dart';
 import 'package:e_com_user/features/orderAndReturn/presentation/view/order_and_return_screen.dart';
 import 'package:e_com_user/general/utils/themes/app_colors.dart';
+
+import 'package:e_com_user/features/Cart/presentation/provider/cart_provider.dart';
+import 'package:e_com_user/features/favourite/presentation/provider/fav_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
@@ -17,10 +20,18 @@ class RootScreen extends StatefulWidget {
 class _RootScreenState extends State<RootScreen> {
   int selectedIndex = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CartProvider>().handleFetchCart();
+      context.read<FavProvider>().handleFetchFavs();
+    });
+  }
+
   final pages = [
     const HomeScreen(),
     const CategoryScreen(),
-    const CartScreen(),
     const OrderAndReturnScreen(),
     const AddressScreen(),
   ];
@@ -42,7 +53,7 @@ class _RootScreenState extends State<RootScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
+                  boxShadow: [ 
                     BoxShadow(
                       color: Colors.black.withValues(alpha: .08),
                       blurRadius: 20,
@@ -75,7 +86,6 @@ class _RootScreenState extends State<RootScreen> {
                   tabs: const [
                     GButton(icon: Icons.home_outlined, text: ''),
                     GButton(icon: Icons.grid_view_rounded, text: ''),
-                    GButton(icon: Icons.shopping_cart, text: ''),
                     GButton(icon: Icons.receipt_long, text: ''),
                     GButton(icon: Icons.person_outline, text: ''),
                   ],

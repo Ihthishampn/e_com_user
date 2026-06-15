@@ -1,6 +1,7 @@
 import 'package:e_com_user/features/Auth/presentation/view/login_screen.dart';
 import 'package:e_com_user/features/Auth/presentation/view/otp_screen.dart';
 import 'package:e_com_user/features/Home/presentation/view/home_screen.dart';
+import 'package:e_com_user/features/Cart/presentation/view/cart_screen.dart';
 import 'package:e_com_user/features/Root/presentation/view/root_screen.dart';
 import 'package:e_com_user/features/favourite/presentation/view/favourite_screen.dart';
 import 'package:e_com_user/general/services/go_route/otp_args.dart';
@@ -39,6 +40,10 @@ GoRouter createRouter({required bool isLoggedIn}) {
       GoRoute(
         path: RouteNames.fav,
         builder: (context, state) => const FavouriteScreen(),
+      ),
+      GoRoute(
+        path: RouteNames.cart,
+        builder: (context, state) => const CartScreen(),
       ),
     ],
   );

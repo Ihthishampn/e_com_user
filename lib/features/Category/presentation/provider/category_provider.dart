@@ -16,8 +16,6 @@ class CategoryProvider with ChangeNotifier {
     final CategoryRepo repo = getIt<CategoryRepo>();
     _sub = repo.fetchCategories().listen(
       (list) {
-        // Prepend a synthetic "All" category so UI can always show an
-        // option to display all products. Use id 'all' to identify it.
         final allCategory = CategoryModel(
           id: 'all',
           categoryName: 'All',
@@ -28,7 +26,6 @@ class CategoryProvider with ChangeNotifier {
         categories = [allCategory, ...list];
         isLoading = false;
         if (selectedIndex >= categories.length) selectedIndex = 0;
-        // Debug log
         debugPrint('CategoryProvider: loaded ${categories.length} categories');
         notifyListeners();
       },

@@ -1,4 +1,6 @@
+import 'package:e_com_user/features/Cart/presentation/provider/cart_provider.dart';
 import 'package:e_com_user/features/favourite/presentation/provider/fav_provider.dart';
+import 'package:e_com_user/general/services/go_route/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +22,7 @@ class HomeAppBarActions extends StatelessWidget {
           children: [
             IconButton(
               onPressed: () {
-                context.push("fav");
+                context.push(RouteNames.fav);
               },
               icon: Icon(
                 Icons.favorite,
@@ -38,7 +40,7 @@ class HomeAppBarActions extends StatelessWidget {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
+                      color: Colors.black.withValues(alpha: 0.15),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -65,12 +67,58 @@ class HomeAppBarActions extends StatelessWidget {
           ],
         ),
         const SizedBox(width: 4),
-        IconButton(
-          onPressed: () {
-            context.push("cart");
-          },
-          icon: Icon(Icons.shopping_cart_outlined, color: Colors.red, size: 26),
+     Stack(
+  clipBehavior: Clip.none,
+  children: [
+    IconButton(
+      onPressed: () {
+        context.push(RouteNames.cart);
+      },
+      icon: const Icon(
+        Icons.shopping_cart_outlined,
+        color: Colors.red,
+        size: 26,
+      ),
+    ),
+    Positioned(
+      right: 4,
+      top: 4,
+      child: Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: badgeBgColor,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.15),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
+        constraints: const BoxConstraints(
+          minWidth: 18,
+          minHeight: 18,
+        ),
+        child: Center(
+          child: Consumer<CartProvider>(
+            builder: (context, cart, child) {
+              return Text(
+                "${cart.cartList.length}",
+                style: TextStyle(
+                  color: isCollapsed ? Colors.white : Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 10,
+                  height: 1.0,
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    ),
+  ],
+),
         const SizedBox(width: 8),
       ],
     );

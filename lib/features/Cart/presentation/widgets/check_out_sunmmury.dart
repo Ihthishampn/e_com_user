@@ -1,20 +1,18 @@
+import 'package:e_com_user/features/Cart/data/model/cart_item_model.dart';
 import 'package:flutter/material.dart';
 
 class CheckoutSummary extends StatelessWidget {
-  final List<Map<String, dynamic>> items;
+  final List<CartItemModel> cartItems;
 
-  const CheckoutSummary({super.key, required this.items});
-
-  int _parsePrice(String price) =>
-      int.tryParse(price.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+  const CheckoutSummary({super.key, required this.cartItems});
 
   @override
   Widget build(BuildContext context) {
-    final subtotal = items.fold<int>(
+    final subtotal = cartItems.fold<double>(
       0,
-      (s, it) => s + _parsePrice(it['price'] as String) * (it['qty'] as int),
+      (s, item) => s + (item.productPrice * item.quantity),
     );
-    final delivery = 40;
+    const delivery = 40;
     final total = subtotal + delivery;
 
     return Container(
@@ -23,16 +21,16 @@ class CheckoutSummary extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
-          BoxShadow(color: Colors.grey.withOpacity(.06), blurRadius: 8),
+          BoxShadow(color: Colors.grey.withValues(alpha: .06), blurRadius: 8),
         ],
       ),
       child: Column(
         children: [
-          _priceRow('Subtotal', '₹${subtotal.toString()}'),
+          _priceRow('Subtotal', '₹${subtotal.toStringAsFixed(0)}'),
           const SizedBox(height: 8),
           _priceRow('Delivery', '₹$delivery'),
           const Divider(height: 20),
-          _priceRow('Total', '₹${total.toString()}', isTotal: true),
+          _priceRow('Total', '₹${total.toStringAsFixed(0)}', isTotal: true),
         ],
       ),
     );

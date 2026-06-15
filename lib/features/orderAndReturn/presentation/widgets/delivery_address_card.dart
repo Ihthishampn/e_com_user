@@ -1,6 +1,5 @@
-import 'package:e_com_user/general/utils/themes/app_text_style.dart';
 import 'package:flutter/material.dart';
-
+import 'package:e_com_user/general/utils/themes/app_text_style.dart';
 class DeliveryAddressCard extends StatelessWidget {
   final String recipientName;
   final String address;

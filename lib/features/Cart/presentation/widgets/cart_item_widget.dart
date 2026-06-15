@@ -75,20 +75,33 @@ class CartItemWidget extends StatelessWidget {
           ),
         ),
 //  + and - 
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildQtyButton(icon: Icons.remove, onTap: onDecrement),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: Text(
-                '$quantity',
-                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+        if (isCartScreen)
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildQtyButton(icon: Icons.remove, onTap: onDecrement),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: Text(
+                  '$quantity',
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                ),
+              ),
+              _buildQtyButton(icon: Icons.add, onTap: onIncrement),
+            ],
+          )
+        else
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Text(
+              'Qty: $quantity',
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+                color: Color(0xFF64748B),
               ),
             ),
-            _buildQtyButton(icon: Icons.add, onTap: onIncrement),
-          ],
-        ),
+          ),
       ],
     );
   }

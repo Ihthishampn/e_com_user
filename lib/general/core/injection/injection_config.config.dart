@@ -55,8 +55,8 @@ import 'package:e_com_user/features/Home/data/use_case/product_use_case.dart'
 import 'package:e_com_user/features/Home/domain/product_repo.dart' as _i294;
 import 'package:e_com_user/general/core/module/dio_client/dio_module.dart'
     as _i39;
-import 'package:e_com_user/general/core/module/firebase_module/firebase_module.dart'
-    as _i33;
+import 'package:e_com_user/general/core/module/dio_client/firebase_module.dart'
+    as _i856;
 import 'package:e_com_user/general/services/local_storage/app_preferences.dart'
     as _i585;
 import 'package:e_com_user/general/services/local_storage/preference_module.dart'
@@ -141,4 +141,4 @@ class _$PreferenceModule extends _i468.PreferenceModule {}
 
 class _$DioModule extends _i39.DioModule {}
 
-class _$FirebaseModule extends _i33.FirebaseModule {}
+class _$FirebaseModule extends _i856.FirebaseModule {}

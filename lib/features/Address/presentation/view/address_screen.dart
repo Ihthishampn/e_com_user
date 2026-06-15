@@ -1,12 +1,13 @@
 import 'package:e_com_user/features/Address/data/model/address_model.dart';
 import 'package:e_com_user/features/Address/presentation/provider/address_provider.dart';
+import 'package:e_com_user/general/utils/enums/app_state.dart';
+import 'package:e_com_user/general/utils/themes/app_colors.dart';
+import 'package:e_com_user/general/utils/themes/app_text_style.dart';
 import 'package:flutter/material.dart';
 import 'package:e_com_user/features/Address/presentation/widgets/address_progress_line.dart';
 import 'package:e_com_user/features/Address/presentation/widgets/address_submit_button.dart';
-import 'package:e_com_user/general/utils/enums/app_state.dart';
 import 'package:e_com_user/features/Address/presentation/widgets/address_text_field.dart';
-import 'package:e_com_user/general/utils/themes/app_colors.dart';
-import 'package:e_com_user/general/utils/themes/app_text_style.dart';
+
 import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
 
@@ -36,6 +37,11 @@ class _AddressScreenState extends State<AddressScreen> {
     _addressController.addListener(_calculateProgress);
     _landmarkController.addListener(_calculateProgress);
     _notesController.addListener(_calculateProgress);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = context.read<AddressProvider>();
+      provider.fetchAddress();
+    });
   }
 
   void _calculateProgress() {
@@ -94,76 +100,203 @@ class _AddressScreenState extends State<AddressScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
               child: Column(
                 children: [
-                  Container(
-                    width: double.infinity,
-                    height: 140,
-                    padding: const EdgeInsets.all(12),
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF111827),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFF374151)),
+                  // Saved Addresses Headline
+                  if (addressProv.addressList.isNotEmpty) ...[
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Saved Addresses',
+                        style: AppTextStyles.titleMedium.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                    child: Builder(
-                      builder: (context) {
-                        if (addressProv.fetchState == AppState.loading) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
+                    const Gap(10),
+                  ],
 
-                        if (addressProv.addressList.isEmpty) {
-                          return Center(
+                  Builder(
+                    builder: (context) {
+                      if (addressProv.fetchState == AppState.loading) {
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 20),
+                          child: Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
+
+                      if (addressProv.addressList.isEmpty) {
+                        return Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          margin: const EdgeInsets.only(bottom: 24),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1E293B),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: const Color(0xFF334155)),
+                          ),
+                          child: Center(
                             child: Text(
                               'No address saved',
                               style: AppTextStyles.titleMedium.copyWith(
                                 color: const Color(0xFF94A3B8),
                               ),
                             ),
-                          );
-                        }
-
-                        final AddressModel a = addressProv.addressList.first;
-                        return Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    a.name,
-                                    style: AppTextStyles.titleMedium.copyWith(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const Gap(6),
-                                  Text(
-                                    a.phone,
-                                    style: AppTextStyles.bodySmall.copyWith(
-                                      color: const Color(0xFF9CA3AF),
-                                    ),
-                                  ),
-                                  const Gap(8),
-                                  Flexible(
-                                    child: Text(
-                                      a.address,
-                                      style: AppTextStyles.bodyMedium.copyWith(
-                                        color: const Color(0xFF9CA3AF),
-                                      ),
-                                      maxLines: 3,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            // removed 'Use' button per request
-                          ],
+                          ),
                         );
-                      },
-                    ),
+                      }
+
+                      return Column(
+                        children: List.generate(addressProv.addressList.length, (index) {
+                          final a = addressProv.addressList[index];
+                          final numberPrefix = '${index + 1} )  ';
+
+                          return Container(
+                            width: double.infinity,
+                            margin: const EdgeInsets.only(bottom: 12),
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF1E293B),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: const Color(0xFF334155), width: 1),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            numberPrefix,
+                                            style: AppTextStyles.titleMedium.copyWith(
+                                              color: AppColors.primaryColor,
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              a.name,
+                                              style: AppTextStyles.titleMedium.copyWith(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const Gap(8),
+                                      Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.phone_rounded,
+                                            size: 14,
+                                            color: Color(0xFF94A3B8),
+                                          ),
+                                          const Gap(6),
+                                          Text(
+                                            a.phone,
+                                            style: AppTextStyles.bodyMedium.copyWith(
+                                              color: const Color(0xFF94A3B8),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const Gap(8),
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Icon(
+                                            Icons.location_on_rounded,
+                                            size: 14,
+                                            color: Color(0xFF94A3B8),
+                                          ),
+                                          const Gap(6),
+                                          Expanded(
+                                            child: Text(
+                                              a.address,
+                                              style: AppTextStyles.bodyMedium.copyWith(
+                                                color: const Color(0xFFCBD5E1),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      if (a.landMark.isNotEmpty) ...[
+                                        const Gap(6),
+                                        Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.explore_rounded,
+                                              size: 14,
+                                              color: Color(0xFF94A3B8),
+                                            ),
+                                            const Gap(6),
+                                            Expanded(
+                                              child: Text(
+                                                'Landmark: ${a.landMark}',
+                                                style: AppTextStyles.bodySmall.copyWith(
+                                                  color: const Color(0xFF94A3B8),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                      if (a.note.isNotEmpty) ...[
+                                        const Gap(6),
+                                        Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.description_rounded,
+                                              size: 14,
+                                              color: Color(0xFF94A3B8),
+                                            ),
+                                            const Gap(6),
+                                            Expanded(
+                                              child: Text(
+                                                'Note: ${a.note}',
+                                                style: AppTextStyles.bodySmall.copyWith(
+                                                  color: const Color(0xFF94A3B8),
+                                                  fontStyle: FontStyle.italic,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.delete_outline_rounded,
+                                    color: Colors.redAccent,
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    addressProv.removeAddress(id: a.id);
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      );
+                    },
                   ),
+                  const Gap(24),
                   AddressTextField(
                     controller: _nameController,
                     label: 'Full Name',
@@ -181,8 +314,9 @@ class _AddressScreenState extends State<AddressScreen> {
                     validator: (v) {
                       final s = v?.trim() ?? '';
                       if (s.isEmpty) return 'Phone number is required';
-                      if (s.length != 10)
+                      if (s.length != 10) {
                         return 'Enter a 10 digit phone number';
+                      }
                       return null;
                     },
                   ),

@@ -17,6 +17,13 @@ class CartProvider with ChangeNotifier {
 
   List<CartItemModel> cartList = [];
 
+  String selectedPaymentMethod = 'Cash on Delivery';
+
+  void setPaymentMethod(String method) {
+    selectedPaymentMethod = method;
+    notifyListeners();
+  }
+
   Future<void> handleFetchCart() async {
     if (fetchcartState == AppState.loading) return;
     error = null;
@@ -48,20 +55,65 @@ class CartProvider with ChangeNotifier {
     }
     notifyListeners();
   }
+
+  Future<void> increaseQuantity({required String productId}) async {
+    try {
+      await repo.increaseQuantity(productId: productId);
+      final index = cartList.indexWhere(
+        (index) => index.productId == productId,
+      );
+
+      if (index != -1) {
+        cartList[index] = cartList[index].copyWith(
+          quantity: cartList[index].quantity + 1,
+        );
+        log("local list updated quantity");
+      }
+
+      notifyListeners();
+    } catch (e) {
+      log("error in provider while increase quantirty from cart $e");
+    }
+  }
+
+  Future<void> decreaseQuantity({required String productId}) async {
+    try {
+      await repo.decreaseQuantity(productId: productId);
+
+      final index = cartList.indexWhere(
+        (element) => element.productId == productId,
+      );
+
+      if (index != -1 && cartList[index].quantity > 1) {
+        cartList[index] = cartList[index].copyWith(
+          quantity: cartList[index].quantity - 1,
+        );
+      } else {
+       await removeFromCart(productId: productId);
+      }
+    } catch (e) {
+      log("error in provider while decrease quantity from cart $e");
+    }
+    notifyListeners();
+  }
+
+  Future<void> removeFromCart({required String productId}) async {
+    try {
+      await repo.removeFromCart(productId: productId);
+      cartList.removeWhere((element) => element.productId == productId);
+    } catch (e) {
+      log("error in provider while remove from cart $e");
+    }
+    notifyListeners();
+  }
+
+  Future<void> clearCart() async {
+    try {
+      await repo.clearCart();
+      cartList.clear();
+    } catch (e) {
+      log("error in provider while clear  cart $e");
+    }
+    notifyListeners();
+  }
 }
-
-
-
-
-
-
-// import 'package:e_com_user/features/Cart/data/model/cart_item_model.dart';
-
-// abstract class CartRepo {
-//   Future<List<CartItemModel>> fetchCart();
-//   Future<void> addToCart({required CartItemModel cartItem});
-//   Future<void> removeFromCart({required String productId});
-//   Future<void> increaseQuantity({required String productId});
-//   Future<void> decreaseQuantity({required String productId});
-//   Future<void> clearCart();
-// }

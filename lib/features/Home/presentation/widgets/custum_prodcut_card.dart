@@ -1,5 +1,6 @@
-import 'dart:developer';
 
+import 'package:e_com_user/features/Cart/data/model/cart_item_model.dart';
+import 'package:e_com_user/features/Cart/presentation/provider/cart_provider.dart';
 import 'package:e_com_user/features/Home/data/model/product_model.dart' as pm;
 import 'package:e_com_user/features/Home/presentation/view/product_details_screen.dart';
 import 'package:e_com_user/features/favourite/data/model/favourite_model.dart';
@@ -234,22 +235,112 @@ class ProductCard extends StatelessWidget {
 
                         const Spacer(),
 
-                        GestureDetector(
-                          onTap: () {
-                            log("clicked 2");
+                        Consumer<CartProvider>(
+                          builder: (context, cart, child) {
+                            final isInCart = cart.cartList.any(
+                              (element) =>
+                                  element.productId == product.productId,
+                            );
+
+                            return GestureDetector(
+                              onTap: () async {
+                                if (!isInCart) {
+                                  cart.addToCart(
+                                    cartItem: CartItemModel(
+                                      productId: product.productId ?? "No name",
+                                      productName: product.productName,
+                                      quantity: 1,
+                                      productPrice: sellingPrice,
+                                      imageUrl: product.images.first,
+                                      availableStock: mainVariant?.stock ?? 0,
+                                    ),
+                                  );
+                                } else {
+                                  final bool? shouldRemove = await showDialog<bool>(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(15),
+                                        ),
+                                        title: Row(
+                                          children: [
+                                            const Icon(Icons.remove_shopping_cart, color: Colors.red),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              "Remove from Cart",
+                                              style: AppTextStyles.titleMedium.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.lightBlack,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        content: Text(
+                                          "Are you sure you want to remove this product from your cart?",
+                                          style: AppTextStyles.bodyMedium.copyWith(
+                                            color: Colors.grey.shade700,
+                                          ),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.of(context).pop(false),
+                                            style: TextButton.styleFrom(
+                                              foregroundColor: Colors.grey.shade600,
+                                            ),
+                                            child: const Text("Cancel", style: TextStyle(fontWeight: FontWeight.w600)),
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: () => Navigator.of(context).pop(true),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.red,
+                                              foregroundColor: Colors.white,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
+                                              elevation: 0,
+                                            ),
+                                            child: const Text("Remove", style: TextStyle(fontWeight: FontWeight.bold)),
+                                          ),
+                                        ],
+                                        backgroundColor: Colors.white,
+                                      );
+                                    },
+
+                                  );
+
+
+                                  if (shouldRemove == true) {
+
+                                    await cart.removeFromCart(
+
+                                      productId: product.productId!,
+
+                                    );
+
+                                  }
+
+                                }
+
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: isInCart
+                                      ? Colors.green
+                                      : AppColors.primaryColor,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(
+                                  isInCart
+                                      ? Icons.shopping_cart
+                                      : Icons.shopping_cart_outlined,
+                                  size: 18,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            );
                           },
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryColor,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(
-                              Icons.shopping_cart_outlined,
-                              size: 18,
-                              color: Colors.white,
-                            ),
-                          ),
                         ),
                       ],
                     ),

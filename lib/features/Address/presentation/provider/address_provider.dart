@@ -13,10 +13,16 @@ class AddressProvider with ChangeNotifier {
   AddressProvider(this.repo);
 
   List<AddressModel> addressList = [];
+  AddressModel? selectedAddress;
 
   AppState fetchState = AppState.inital;
   AppState addState = AppState.inital;
   AppState removeState = AppState.inital;
+
+  void selectAddress(AddressModel address) {
+    selectedAddress = address;
+    notifyListeners();
+  }
 
   Future<void> handleAddAddress({required AddressModel address}) async {
     if (addState == AppState.loading) return;

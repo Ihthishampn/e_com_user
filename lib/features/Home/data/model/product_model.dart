@@ -66,7 +66,7 @@ class ProductModel {
     List<String>? searchKeywords,
   }) {
     return ProductModel(
-      productId: id ?? this.productId,
+      productId: id ?? productId,
       productName: productName ?? this.productName,
       shortNote: shortNote ?? this.shortNote,
       categoryId: categoryId ?? this.categoryId,
