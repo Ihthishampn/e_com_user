@@ -38,8 +38,8 @@ class CartUseCase {
     }
   }
 
-  Future<void> decrementQuantity({required String productId}) async{
-   try {
+  Future<void> decrementQuantity({required String productId}) async {
+    try {
       await _doc.doc(productId).update({"quantity": FieldValue.increment(-1)});
     } catch (e) {
       log("error while increment a product quantiy : $e");

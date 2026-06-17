@@ -12,7 +12,7 @@ class AddressSubmitButton extends StatelessWidget {
     required this.enabled,
     required this.onPressed,
     required this.primaryAccent,
-    this.isLoading = false,
+    this.isLoading =  false,
   });
 
   @override
@@ -55,12 +55,12 @@ class AddressSubmitButton extends StatelessWidget {
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
+                ),      
               )
             : Text(
                 'Secure Address',
                 style: AppTextStyles.titleMedium.copyWith(
-                  color: enabled ? Colors.white : Colors.white38,
+                  color: enabled  ? Colors.white : Colors.white38,
                   fontWeight: FontWeight.w700,
                 ),
               ),

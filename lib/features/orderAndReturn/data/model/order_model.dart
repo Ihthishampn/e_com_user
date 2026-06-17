@@ -8,6 +8,7 @@ import 'package:e_com_user/general/utils/enums/payment_status.dart';
 
 class OrderModel {
   final String orderId;
+    final String orderNumber; 
   final String userId;            
   final String userName;         
   final String userPhone;        
@@ -22,6 +23,7 @@ class OrderModel {
 
   const OrderModel({
     required this.orderId,
+    required this.orderNumber,
     required this.userId,
     required this.userName,
     required this.userPhone,
@@ -39,6 +41,7 @@ class OrderModel {
     return OrderModel(
       orderId: id,
       userId: map['userId'] ?? '',
+      orderNumber: map['orderNumber'] ?? '',
       userName: map['userName'] ?? '',
       userPhone: map['userPhone'] ?? '',
       date: map['date'] != null ? DateTime.parse(map['date']) : DateTime.now(),
@@ -66,6 +69,7 @@ class OrderModel {
     return {
       'userId': userId,
       'userName': userName,
+      'orderNumber':orderNumber,
       'userPhone': userPhone,
       'date': date.toIso8601String(),
       'paymentMethod': paymentMethod,

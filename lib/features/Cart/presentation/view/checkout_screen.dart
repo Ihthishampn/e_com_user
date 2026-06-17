@@ -152,7 +152,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
           ),
 
-          // High-Contrast Interactive Checkout Sticky Dock
           _buildActionStickyDock(context, total),
         ],
       ),
@@ -650,9 +649,9 @@ class _PaymentStatusScreenState extends State<PaymentStatusScreen> {
               elevation: 0,
             ),
             onPressed: () {
-              // Pop back to the cart screen
-              Navigator.of(context).pop(); // pop status screen
-              Navigator.of(context).pop(); // pop checkout screen
+              //  back to the cart screen
+              Navigator.of(context).pop(); 
+              Navigator.of(context).pop(); 
             },
             child: const Text(
               'Back to Cart',
