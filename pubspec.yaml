@@ -50,6 +50,7 @@ dependencies:
   sendotp_flutter_sdk: ^0.0.2
   shared_preferences: ^2.5.5
   flutter_dotenv: ^5.2.1
+  uuid: ^4.5.3
 
 dev_dependencies:
   flutter_test:
@@ -62,7 +63,7 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
   build_runner: ^2.15.0
-  uuid: ^4.5.3
+  
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

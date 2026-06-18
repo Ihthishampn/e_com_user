@@ -30,7 +30,13 @@ class ProductProvider with ChangeNotifier {
         try {
           final id = _categoryIdFromProvider(catProv);
           debugPrint('ProductProvider: CategoryProvider changed -> $id');
-          _subscribeToCategory(id);
+          // If there's an active search query, re-run the search scoped to the
+          // new category; otherwise subscribe to the category feed.
+          if (_searchQuery.trim().isNotEmpty) {
+            search(_searchQuery);
+          } else {
+            _subscribeToCategory(id);
+          }
         } catch (e, st) {
           debugPrint('ProductProvider: error reading category change: $e\n$st');
         }
@@ -53,7 +59,6 @@ class ProductProvider with ChangeNotifier {
   }
 
   void _subscribeToCategory(String categoryId) {
-  
     if (_currentCategoryId == categoryId && _sub != null) return;
     _currentCategoryId = categoryId;
     _sub?.cancel();
@@ -101,8 +106,66 @@ class ProductProvider with ChangeNotifier {
     }
   }
 
+  /// Perform a text search. If [query] is empty, fall back to the current
+  /// category subscription. If a specific category is active we perform a
+  /// category-scoped search; otherwise search across all products.
+  void search(String query) {
+    _sub?.cancel();
+    _searchQuery = query;
+
+    final catId = _currentCategoryId;
+    if (query.trim().isEmpty) {
+      // restore normal category subscription
+      _subscribeToCategory(catId);
+      return;
+    }
+
+    isLoading = true;
+    notifyListeners();
+
+    if (catId.isEmpty || catId == 'all') {
+      _sub = _repo
+          .searchProducts(query)
+          .listen(
+            (list) {
+              products = list;
+              isLoading = false;
+              notifyListeners();
+            },
+            onError: (e) {
+              isLoading = false;
+              debugPrint('ProductProvider: search error: $e');
+              notifyListeners();
+            },
+          );
+    } else {
+      _sub = _repo
+          .searchByCategory(query, catId)
+          .listen(
+            (list) {
+              products = list;
+              isLoading = false;
+              notifyListeners();
+            },
+            onError: (e) {
+              isLoading = false;
+              debugPrint('ProductProvider: category search error: $e');
+              notifyListeners();
+            },
+          );
+    }
+  }
+
+  String _searchQuery = '';
+
   void setCategory(String categoryId) {
-    _subscribeToCategory(categoryId);
+    if (_searchQuery.trim().isNotEmpty) {
+      // if user has an active search, perform category-scoped search
+      _currentCategoryId = categoryId;
+      search(_searchQuery);
+    } else {
+      _subscribeToCategory(categoryId);
+    }
   }
 
   List<ProductModel> productsByCategory(String categoryId) {

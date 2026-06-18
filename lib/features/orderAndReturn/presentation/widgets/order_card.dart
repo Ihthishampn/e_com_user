@@ -1,4 +1,3 @@
-import 'package:e_com_user/features/orderAndReturn/presentation/view/track_order_screen.dart';
 import 'package:flutter/material.dart';
 
 class OrderCard extends StatelessWidget {
@@ -8,6 +7,9 @@ class OrderCard extends StatelessWidget {
   final String image;
   final Color statusColor;
   final VoidCallback onReturnPressed;
+  final VoidCallback? onTrackPressed;
+  final VoidCallback? onCancelPressed;
+  final bool canCancel;
 
   const OrderCard({
     super.key,
@@ -17,6 +19,9 @@ class OrderCard extends StatelessWidget {
     required this.image,
     required this.statusColor,
     required this.onReturnPressed,
+    this.onTrackPressed,
+    this.onCancelPressed,
+    this.canCancel = false,
   });
 
   @override
@@ -131,24 +136,17 @@ class OrderCard extends StatelessWidget {
                 child: OutlinedButton(
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFF475569),
-                    side: const BorderSide(color: Color(0xFFE2E8F0), width: 1.5),
+                    side: const BorderSide(
+                      color: Color(0xFFE2E8F0),
+                      width: 1.5,
+                    ),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     visualDensity: VisualDensity.compact,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => TrackOrderScreen(
-                          orderId: '',
-                          productName: name,
-                          orderStatus: 'pending',
-                        ),
-                      ),
-                    );
-                  },
+                  onPressed: onTrackPressed,
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -156,7 +154,10 @@ class OrderCard extends StatelessWidget {
                       SizedBox(width: 6),
                       Text(
                         'Track Order',
-                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
@@ -184,7 +185,43 @@ class OrderCard extends StatelessWidget {
                         SizedBox(width: 6),
                         Text(
                           'Return',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ] else if (canCancel) ...[
+                const SizedBox(width: 10),
+                Expanded(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFFDC2626),
+                      side: const BorderSide(
+                        color: Color(0xFFDC2626),
+                        width: 1.5,
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      visualDensity: VisualDensity.compact,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: onCancelPressed,
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.close_rounded, size: 16),
+                        SizedBox(width: 6),
+                        Text(
+                          'Cancel',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),

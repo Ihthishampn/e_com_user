@@ -48,7 +48,6 @@ class _OtpScreenState extends State<OtpScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
               const Gap(10),
 
               Text(

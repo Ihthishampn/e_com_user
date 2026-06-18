@@ -27,4 +27,46 @@ class ProductUseCase {
               .toList(),
         );
   }
+
+  Stream<List<ProductModel>> searchProducts(String query) {
+    final q = query.trim().toLowerCase();
+    if (q.isEmpty) return getProducts();
+    final parts = q.split(RegExp(r"\s+"));
+    final tokens = parts.where((p) => p.isNotEmpty).take(10).toList();
+
+    if (tokens.isEmpty) return getProducts();
+
+    return firebaseFirestore
+        .collection('products')
+        .where('searchKeywords', arrayContainsAny: tokens)
+        .snapshots()
+        .map(
+          (event) => event.docs
+              .map((e) => ProductModel.fromMap(e.data(), e.id))
+              .toList(),
+        );
+  }
+
+  Stream<List<ProductModel>> searchProductsByCategory(
+    String query,
+    String categoryId,
+  ) {
+    final q = query.trim().toLowerCase();
+    if (q.isEmpty) return getProductsByCategory(categoryId);
+    final parts = q.split(RegExp(r"\s+"));
+    final tokens = parts.where((p) => p.isNotEmpty).take(10).toList();
+
+    if (tokens.isEmpty) return getProductsByCategory(categoryId);
+
+    return firebaseFirestore
+        .collection('products')
+        .where('categoryId', isEqualTo: categoryId)
+        .where('searchKeywords', arrayContainsAny: tokens)
+        .snapshots()
+        .map(
+          (event) => event.docs
+              .map((e) => ProductModel.fromMap(e.data(), e.id))
+              .toList(),
+        );
+  }
 }

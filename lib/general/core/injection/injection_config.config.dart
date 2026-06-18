@@ -53,6 +53,14 @@ import 'package:e_com_user/features/Home/data/repo_impl/product_repo_impl.dart'
 import 'package:e_com_user/features/Home/data/use_case/product_use_case.dart'
     as _i891;
 import 'package:e_com_user/features/Home/domain/product_repo.dart' as _i294;
+import 'package:e_com_user/features/orderAndReturn/data/order_use_case.dart/order_use_case.dart'
+    as _i781;
+import 'package:e_com_user/features/orderAndReturn/data/orders_repo_impl/orders_repo_impl.dart'
+    as _i969;
+import 'package:e_com_user/features/orderAndReturn/domain/order_repository.dart'
+    as _i590;
+import 'package:e_com_user/features/orderAndReturn/presentation/provider/order_provider.dart'
+    as _i981;
 import 'package:e_com_user/general/core/module/dio_client/dio_module.dart'
     as _i39;
 import 'package:e_com_user/general/core/module/dio_client/firebase_module.dart'
@@ -98,6 +106,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i496.FavUseCase>(
       () => _i496.FavUseCase(gh<_i974.FirebaseFirestore>()),
     );
+    gh.lazySingleton<_i781.OrderUseCase>(
+      () => _i781.OrderUseCase(gh<_i974.FirebaseFirestore>()),
+    );
     gh.lazySingleton<_i294.ProductRepo>(
       () => _i977.ProductRepoImpl(gh<_i891.ProductUseCase>()),
     );
@@ -109,6 +120,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i460.FavRepo>(
       () => _i313.FavouriteRepoImpl(gh<_i496.FavUseCase>()),
+    );
+    gh.lazySingleton<_i590.OrderRepository>(
+      () => _i969.OrdersRepoImpl(gh<_i781.OrderUseCase>()),
+    );
+    gh.factory<_i981.OrderProvider>(
+      () => _i981.OrderProvider(gh<_i590.OrderRepository>()),
     );
     gh.singleton<_i585.AppPreferences>(
       () => preferenceModule.appPreferences(gh<_i460.SharedPreferences>()),

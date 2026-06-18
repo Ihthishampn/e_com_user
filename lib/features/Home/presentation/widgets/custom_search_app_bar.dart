@@ -1,5 +1,7 @@
 import 'package:e_com_user/general/utils/themes/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:e_com_user/features/Home/presentation/provider/product_provider.dart';
 
 class AppSearchBar extends StatelessWidget {
   final bool isCollapsed;
@@ -12,6 +14,14 @@ class AppSearchBar extends StatelessWidget {
       height: 45,
       child: SearchBar(
         hintText: "Search for products",
+        onChanged: (value) {
+          try {
+            final prov = Provider.of<ProductProvider>(context, listen: false);
+            prov.search(value);
+          } catch (_) {
+            // ignore if provider not available
+          }
+        },
 
         leading: Icon(
           Icons.search_outlined,

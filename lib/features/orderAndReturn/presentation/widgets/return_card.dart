@@ -1,4 +1,3 @@
-import 'package:e_com_user/features/orderAndReturn/presentation/view/track_order_screen.dart';
 import 'package:flutter/material.dart';
 
 class ReturnCard extends StatelessWidget {
@@ -7,6 +6,7 @@ class ReturnCard extends StatelessWidget {
   final String status;
   final String image;
   final Color statusColor;
+  final VoidCallback? onViewPressed;
 
   const ReturnCard({
     super.key,
@@ -15,6 +15,7 @@ class ReturnCard extends StatelessWidget {
     required this.status,
     required this.image,
     required this.statusColor,
+    this.onViewPressed,
   });
 
   @override
@@ -128,24 +129,16 @@ class ReturnCard extends StatelessWidget {
             child: OutlinedButton(
               style: OutlinedButton.styleFrom(
                 foregroundColor: primaryColor,
-                side: BorderSide(color: primaryColor.withValues(alpha: 0.2), width: 1.5),
+                side: BorderSide(
+                  color: primaryColor.withValues(alpha: 0.2),
+                  width: 1.5,
+                ),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => TrackOrderScreen(
-                      orderId: '',
-                      productName: name,
-                      orderStatus: status,
-                      isReturn: true,
-                    ),
-                  ),
-                );
-              },
+              onPressed: onViewPressed,
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -158,7 +151,8 @@ class ReturnCard extends StatelessWidget {
                 ],
               ),
             ),
-      )],
+          ),
+        ],
       ),
     );
   }

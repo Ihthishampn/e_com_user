@@ -20,11 +20,12 @@ class ProductRepoImpl implements ProductRepo {
 
   @override
   Stream<List<ProductModel>> searchByCategory(String query, String categoryId) {
-    throw UnimplementedError();
+    return useCase.searchProductsByCategory(query, categoryId);
   }
-//TODO : search in home screen
+
+  //TODO : search in home screen
   @override
   Stream<List<ProductModel>> searchProducts(String query) {
-    throw UnimplementedError();
+    return useCase.searchProducts(query);
   }
 }

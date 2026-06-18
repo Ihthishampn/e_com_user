@@ -5,6 +5,7 @@ import 'package:e_com_user/features/Category/presentation/provider/category_prov
 import 'package:e_com_user/features/Home/presentation/provider/home_provider.dart';
 import 'package:e_com_user/features/Home/presentation/provider/product_provider.dart';
 import 'package:e_com_user/features/favourite/presentation/provider/fav_provider.dart';
+import 'package:e_com_user/features/orderAndReturn/presentation/provider/order_provider.dart';
 import 'package:e_com_user/firebase_options.dart';
 import 'package:e_com_user/general/core/injection/injection_config.dart';
 import 'package:e_com_user/general/services/go_route/route_config.dart';
@@ -52,6 +53,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => getIt<FavProvider>()),
         ChangeNotifierProvider(create: (_) => getIt<AddressProvider>()),
         ChangeNotifierProvider(create: (_) => getIt<CartProvider>()),
+        ChangeNotifierProvider(create: (_) => getIt<OrderProvider>()),
         ChangeNotifierProvider(create: (_) => HomeProvider()),
       ],
       child: EcomUserApp(router: router),

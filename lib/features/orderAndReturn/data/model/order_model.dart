@@ -1,4 +1,4 @@
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_com_user/features/orderAndReturn/data/model/return_refund_model.dart';
 import 'package:e_com_user/features/orderAndReturn/data/model/shipping_model.dart';
 
@@ -8,10 +8,10 @@ import 'package:e_com_user/general/utils/enums/payment_status.dart';
 
 class OrderModel {
   final String orderId;
-    final String orderNumber; 
-  final String userId;            
-  final String userName;         
-  final String userPhone;        
+  final String orderNumber;
+  final String userId;
+  final String userName;
+  final String userPhone;
   final DateTime date;
   final PaymentMethod paymentMethod;
   final PaymentStatus paymentStatus;
@@ -19,7 +19,10 @@ class OrderModel {
   final double amount;
   final List<OrderItemSummary> items;
   final ShippingAddress shippingAddress;
-  final ReturnDetails? returnDetails; 
+  final ReturnDetails? returnDetails;
+  final DateTime createdAt;
+  final DateTime? deliveredAt;
+  final String? cancellationReason;
 
   const OrderModel({
     required this.orderId,
@@ -34,6 +37,9 @@ class OrderModel {
     required this.amount,
     required this.items,
     required this.shippingAddress,
+    required this.createdAt,
+    this.deliveredAt,
+    this.cancellationReason,
     this.returnDetails,
   });
 
@@ -44,8 +50,19 @@ class OrderModel {
       orderNumber: map['orderNumber'] ?? '',
       userName: map['userName'] ?? '',
       userPhone: map['userPhone'] ?? '',
-      date: map['date'] != null ? DateTime.parse(map['date']) : DateTime.now(),
-      paymentMethod: map['paymentMethod'] ?? 'COD',
+      date: () {
+        final v = map['date'] ?? map['createdAt'];
+        if (v == null) return DateTime.now();
+        if (v is Timestamp) return v.toDate();
+        if (v is String) return DateTime.tryParse(v) ?? DateTime.now();
+        return DateTime.now();
+      }(),
+      paymentMethod: PaymentMethod.values.firstWhere(
+        (e) =>
+            e.name.toLowerCase() ==
+            (map['paymentMethod'] as String? ?? '').toLowerCase(),
+        orElse: () => PaymentMethod.cod,
+      ),
       paymentStatus: PaymentStatus.values.firstWhere(
         (e) => e.name == map['paymentStatus'],
         orElse: () => PaymentStatus.pending,
@@ -59,8 +76,23 @@ class OrderModel {
           .map((e) => OrderItemSummary.fromMap(e))
           .toList(),
       shippingAddress: ShippingAddress.fromMap(map['shippingAddress'] ?? {}),
-      returnDetails: map['returnDetails'] != null 
-          ? ReturnDetails.fromMap(map['returnDetails']) 
+      createdAt: () {
+        final v = map['createdAt'] ?? map['date'];
+        if (v == null) return DateTime.now();
+        if (v is Timestamp) return v.toDate();
+        if (v is String) return DateTime.tryParse(v) ?? DateTime.now();
+        return DateTime.now();
+      }(),
+      deliveredAt: () {
+        final v = map['deliveredAt'];
+        if (v == null) return null;
+        if (v is Timestamp) return v.toDate();
+        if (v is String) return DateTime.tryParse(v);
+        return null;
+      }(),
+      cancellationReason: map['cancellationReason'],
+      returnDetails: map['returnDetails'] != null
+          ? ReturnDetails.fromMap(map['returnDetails'])
           : null,
     );
   }
@@ -69,15 +101,18 @@ class OrderModel {
     return {
       'userId': userId,
       'userName': userName,
-      'orderNumber':orderNumber,
+      'orderNumber': orderNumber,
       'userPhone': userPhone,
       'date': date.toIso8601String(),
-      'paymentMethod': paymentMethod,
+      'paymentMethod': paymentMethod.name,
       'paymentStatus': paymentStatus.name,
       'orderStatus': orderStatus.name,
       'amount': amount,
       'items': items.map((e) => e.toMap()).toList(),
       'shippingAddress': shippingAddress.toMap(),
+      'createdAt': createdAt.toIso8601String(),
+      if (deliveredAt != null) 'deliveredAt': deliveredAt!.toIso8601String(),
+      if (cancellationReason != null) 'cancellationReason': cancellationReason,
       if (returnDetails != null) 'returnDetails': returnDetails!.toMap(),
     };
   }
@@ -86,7 +121,7 @@ class OrderModel {
 class OrderItemSummary {
   final String productId;
   final String productName;
-  final String variantName; 
+  final String variantName;
   final int quantity;
   final double price;
   final String imageUrl;
@@ -122,4 +157,3 @@ class OrderItemSummary {
     };
   }
 }
-
