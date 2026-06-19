@@ -69,7 +69,7 @@ class PaymentMethodBottomSheet extends StatelessWidget {
                     cartProvider.setPaymentMethod('UPI');
                   },
                 ),
-                const Gap(12),  
+                const Gap(12),
                 _buildPaymentOption(
                   context: context,
                   icon: Icons.credit_card_outlined,

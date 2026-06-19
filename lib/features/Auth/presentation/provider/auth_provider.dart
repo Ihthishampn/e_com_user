@@ -93,6 +93,10 @@ class AuthProvider with ChangeNotifier {
       log("User saved to Firestore: $phone");
       try {
         await prefs.setLoggedIn(true);
+        // store the user id/phone locally so other flows can access it
+        try {
+          await prefs.setUserId(phone);
+        } catch (_) {}
       } catch (_) {}
     } catch (e) {
       log("Error creating user: $e");

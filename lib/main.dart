@@ -19,6 +19,11 @@ import 'package:provider/provider.dart';
 import 'package:sendotp_flutter_sdk/sendotp_flutter_sdk.dart';
 import 'package:toastification/toastification.dart';
 
+// check list to do next
+
+/// 1  change search logic to using key words list
+/// 2  change verify otp to  cloud funtion
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
@@ -26,11 +31,11 @@ void main() async {
   await Firebase.initializeApp(
     name: "ihthisham",
     options: DefaultFirebaseOptions.currentPlatform,
-    );
-    OTPWidget.initializeWidget(
-  dotenv.env['MSG91_WIDGET_ID']!,
-  dotenv.env['MSG91_AUTH_TOKEN']!,
-);
+  );
+  OTPWidget.initializeWidget(
+    dotenv.env['MSG91_WIDGET_ID']!,
+    dotenv.env['MSG91_AUTH_TOKEN']!,
+  );
   final prefs = getIt<AppPreferences>();
   final router = createRouter(isLoggedIn: prefs.isLoggedin());
 

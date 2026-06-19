@@ -10,6 +10,8 @@ import 'package:e_com_user/general/utils/enums/payment_status.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
+import 'package:e_com_user/general/core/injection/injection_config.dart';
+import 'package:e_com_user/general/services/local_storage/app_preferences.dart';
 
 class PaymentStatusScreen extends StatefulWidget {
   final String paymentMethod;
@@ -52,7 +54,7 @@ class _PaymentStatusScreenState extends State<PaymentStatusScreen> {
       street: selectedAddress.address,
       city: selectedAddress.landMark,
       state: selectedAddress.note,
-      pincode: "673637", 
+      pincode: "673637",
     );
 
     PaymentMethod methodEnum;
@@ -91,10 +93,13 @@ class _PaymentStatusScreenState extends State<PaymentStatusScreen> {
       );
     }).toList();
 
+    final storedUserId = getIt<AppPreferences>().getUserId();
     final order = OrderModel(
       orderId: "",
       orderNumber: "",
-      userId: "9072027963",
+      userId: storedUserId != null && storedUserId.isNotEmpty
+          ? storedUserId
+          : '9072027963',
       userName: selectedAddress.name,
       userPhone: selectedAddress.phone,
       date: DateTime.now(),

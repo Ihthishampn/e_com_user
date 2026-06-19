@@ -17,10 +17,8 @@ class OrderProvider with ChangeNotifier {
   AppState orderPlaceState = AppState.inital;
 
   String? error;
-  // Return request state
   AppState returnRequestState = AppState.inital;
   String? returnError;
-  // Orders list for current user
   AppState ordersState = AppState.inital;
   List<OrderModel> orders = [];
   StreamSubscription<List<OrderModel>>? _ordersSub;
@@ -29,10 +27,10 @@ class OrderProvider with ChangeNotifier {
 
   Future<void> placeOrder({required OrderModel order}) async {
     if (orderPlaceState == AppState.loading) return;
-
     orderPlaceState = AppState.loading;
     error = null;
     notifyListeners();
+
 
     try {
       const uuid = Uuid();
@@ -67,7 +65,7 @@ class OrderProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Load orders from repository and filter by [userId].
+   // ssssssssss[userId]
   Future<void> loadUserOrders({required String userId}) async {
     if (ordersState == AppState.loading) return;
     ordersState = AppState.loading;
@@ -85,6 +83,7 @@ class OrderProvider with ChangeNotifier {
     }
     notifyListeners();
   }
+  
 
   /// Refresh current user's orders (calls loadUserOrders using repo data).
   Future<void> refreshOrders({required String userId}) async {
@@ -105,7 +104,6 @@ class OrderProvider with ChangeNotifier {
     );
   }
 
-  /// Stop listening to orders.
   void stopOrdersListener() {
     _ordersSub?.cancel();
     _ordersSub = null;
@@ -117,7 +115,6 @@ class OrderProvider with ChangeNotifier {
     super.dispose();
   }
 
-  /// Place a return request for an existing order.
   Future<void> placeReturnRequest({
     required String orderId,
     required ReturnDetails details,
@@ -138,14 +135,12 @@ class OrderProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Cancel an order (allowed only if order status != delivered).
   Future<bool> cancelOrder({
     required String orderId,
     required String reason,
   }) async {
     try {
       final order = orders.firstWhere((o) => o.orderId == orderId);
-      // Can only cancel if not delivered, cancelled, or rejected
       if (order.orderStatus == OrderStatus.delivered ||
           order.orderStatus == OrderStatus.cancelled ||
           order.orderStatus == OrderStatus.rejected ||
@@ -164,3 +159,7 @@ class OrderProvider with ChangeNotifier {
     }
   }
 }
+
+
+
+
