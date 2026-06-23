@@ -130,9 +130,13 @@ class PaymentMethodBottomSheet extends StatelessWidget {
                       'Confirm & Pay ₹${total.toStringAsFixed(0)}',
                       style: const TextStyle(
                         fontSize: 15,
+
+
+                        
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+
                   ),
                 ),
               ],

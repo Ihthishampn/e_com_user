@@ -8,3 +8,5 @@ abstract class CartRepo {
   Future<void> decreaseQuantity({required String productId});
   Future<void> clearCart();
 }
+
+// clearCart

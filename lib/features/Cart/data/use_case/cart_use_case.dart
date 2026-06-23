@@ -32,6 +32,8 @@ class CartUseCase {
         batch.delete(doc.reference);
       }
 
+   
+
       await batch.commit();
     } catch (e) {
       log("error ehilr cleat cart form firebase $e");

@@ -95,8 +95,6 @@ class TrackOrderScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    // For return views we already show the status text above.
-                    // Avoid showing the extra 'Order Rejected' banner when viewing returns
                     if (isRejected && !isReturn)
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -176,7 +174,7 @@ class TrackOrderScreen extends StatelessWidget {
                               fontWeight: FontWeight.w800,
                               fontSize: 16,
                             ),
-                          ),
+                                ),
                           SizedBox(height: 8),
                           Text(
                             'There will be no further updates for this order. Please contact support for more information.',
@@ -394,4 +392,3 @@ class TrackOrderScreen extends StatelessWidget {
   }
 }
 
-// extension removed — not used

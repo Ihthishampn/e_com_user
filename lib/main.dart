@@ -49,6 +49,8 @@ void main() async {
     getIt.registerSingleton<ProductProvider>(prodProv);
   }
 
+
+
   runApp(
     MultiProvider(
       providers: [

@@ -106,16 +106,12 @@ class ProductProvider with ChangeNotifier {
     }
   }
 
-  /// Perform a text search. If [query] is empty, fall back to the current
-  /// category subscription. If a specific category is active we perform a
-  /// category-scoped search; otherwise search across all products.
   void search(String query) {
     _sub?.cancel();
     _searchQuery = query;
 
     final catId = _currentCategoryId;
     if (query.trim().isEmpty) {
-      // restore normal category subscription
       _subscribeToCategory(catId);
       return;
     }
@@ -160,7 +156,6 @@ class ProductProvider with ChangeNotifier {
 
   void setCategory(String categoryId) {
     if (_searchQuery.trim().isNotEmpty) {
-      // if user has an active search, perform category-scoped search
       _currentCategoryId = categoryId;
       search(_searchQuery);
     } else {
@@ -178,4 +173,5 @@ class ProductProvider with ChangeNotifier {
     _sub?.cancel();
     super.dispose();
   }
+
 }

@@ -31,7 +31,6 @@ class _AddressListState extends State<AddressList> {
       );
     }
 
-    // No addresses state
     if (addresses.isEmpty) {
       return Column(
         children: [
@@ -55,7 +54,7 @@ class _AddressListState extends State<AddressList> {
                 ),
                 SizedBox(height: 12),
                 Text(
-                  'Please add an address first.',
+                  ' add an address will appear here.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 15,
@@ -83,12 +82,17 @@ class _AddressListState extends State<AddressList> {
       );
     }
 
-    // Auto-select first address if none selected
     if (addressProvider.selectedAddress == null && addresses.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         addressProvider.selectAddress(addresses[0]);
       });
     }
+
+
+///  do firebase funtion with firebase
+/// from after noon
+
+
 
     return Column(
       children: [
@@ -108,7 +112,6 @@ class _AddressListState extends State<AddressList> {
                   addressProvider.selectAddress(a);
                 },
                 onEditTap: () {
-                  // Navigate to address screen for editing
                   _navigateToAddressScreen(context);
                 },
               ),
