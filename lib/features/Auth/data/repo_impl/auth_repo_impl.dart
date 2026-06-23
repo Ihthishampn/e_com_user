@@ -1,16 +1,21 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:e_com_user/features/Auth/data/model/user_model.dart';
 import 'package:e_com_user/features/Auth/domain/repository/auth_repository.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:injectable/injectable.dart';
-import 'package:sendotp_flutter_sdk/sendotp_flutter_sdk.dart';
 
 @LazySingleton(as: AuthRepository)
 class AuthRepoImpl implements AuthRepository {
   final FirebaseFirestore firestore;
 
   AuthRepoImpl(this.firestore);
+
+  final _functions = FirebaseFunctions.instance;
+
+  final _auth = FirebaseAuth.instance;
 
   String _formatPhone(String phone) {
     String identifier = phone.trim().replaceAll(' ', '');
@@ -30,49 +35,55 @@ class AuthRepoImpl implements AuthRepository {
   Future<String> sendOtp({required String phone}) async {
     final identifier = _formatPhone(phone);
 
-    final response = await OTPWidget.sendOTP({'identifier': identifier});
+    final callable = _functions.httpsCallable('sendOtp');
 
-    log("OTP SEND RESPONSE => $response");
+    final result = await callable.call({'phoneNumber': identifier});
 
-    final data = response as Map?;
+    log('SEND OTP => ${result.data}');
 
-    if (data != null && data['type'] == 'success') {
-      return data['message'] ?? 'OTP Sent';
-    }
+    final data = Map<String, dynamic>.from(result.data);
 
-    throw Exception('Failed to send OTP');
+    return data['reqId'];
   }
 
   @override
-  Future<bool> verifyOtp({required String reqId, required String otp}) async {
-    final response = await OTPWidget.verifyOTP({'reqId': reqId, 'otp': otp});
+  Future<bool> verifyOtp({
+    required String phone,
+    required String reqId,
+    required String otp,
+  }) async {
+    try {
+      final callable = _functions.httpsCallable('verifyOtp');
 
-    log("OTP VERIFY RESPONSE => $response");
+      final identifier = _formatPhone(phone);
 
-    final data = response as Map?;
+      final result = await callable.call({
+        'reqId': reqId,
+        'otp': otp,
+        'phoneNumber': identifier,
+      });
 
-    return data != null && data['type'] == 'success';
+      final data = Map<String, dynamic>.from(result.data);
+
+      final token = data['customToken'];
+
+      await _auth.signInWithCustomToken(token);
+
+      return true;
+    } catch (e) {
+      log(e.toString());
+      return false;
+    }
   }
 
   @override
   Future<bool> retryOtp({required String reqId}) async {
-    final response = await OTPWidget.retryOTP({
-      'reqId': reqId,
-      'retryChannel': 11,
-    });
-
-    log("OTP RETRY RESPONSE => $response");
-
-    final data = response as Map?;
-
-    return data != null && data['type'] == 'success';
+    return false;
   }
 
   @override
   Future<void> saveUser({required UserModel user}) async {
     await firestore.collection('users').doc(user.number).set(user.toMap());
-
-    log("USER SAVED => ${user.number}");
   }
 
   @override
@@ -86,7 +97,9 @@ class AuthRepoImpl implements AuthRepository {
   Future<UserModel?> getUser({required String phone}) async {
     final doc = await firestore.collection('users').doc(phone).get();
 
-    if (!doc.exists) return null;
+    if (!doc.exists) {
+      return null;
+    }
 
     return UserModel.fromMap(doc.data()!, doc.id);
   }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:e_com_user/features/Home/data/model/product_model.dart';
 import 'package:e_com_user/features/Home/domain/product_repo.dart';
@@ -7,13 +8,17 @@ import 'package:e_com_user/features/Category/presentation/provider/category_prov
 import 'package:e_com_user/general/core/injection/injection_config.dart';
 
 class ProductProvider with ChangeNotifier {
-  StreamSubscription<List<ProductModel>>? _sub;
   String _currentCategoryId = 'all';
 
   final ProductRepo _repo = getIt<ProductRepo>();
 
   List<ProductModel> products = [];
   bool isLoading = true;
+
+  DocumentSnapshot? _lastDoc;
+  bool hasMore = true;
+  bool isFetchingMore = false;
+  final int pageSize = 20;
 
   ProductProvider() {
     debugPrint('ProductProvider: constructed');
@@ -24,18 +29,19 @@ class ProductProvider with ChangeNotifier {
       debugPrint(
         'ProductProvider: initial category from CategoryProvider -> $initialCat',
       );
-      _subscribeToCategory(initialCat);
+      _fetchInitialForCategory(initialCat);
 
       catProv.addListener(() {
         try {
           final id = _categoryIdFromProvider(catProv);
           debugPrint('ProductProvider: CategoryProvider changed -> $id');
-          // If there's an active search query, re-run the search scoped to the
-          // new category; otherwise subscribe to the category feed.
+      
           if (_searchQuery.trim().isNotEmpty) {
+            _resetPagination();
             search(_searchQuery);
           } else {
-            _subscribeToCategory(id);
+            _resetPagination();
+            _fetchInitialForCategory(id);
           }
         } catch (e, st) {
           debugPrint('ProductProvider: error reading category change: $e\n$st');
@@ -45,7 +51,7 @@ class ProductProvider with ChangeNotifier {
       debugPrint(
         'ProductProvider: error during init, falling back to all -> $e\n$st',
       );
-      _subscribeToCategory('all');
+      _fetchInitialForCategory('all');
     }
   }
 
@@ -58,97 +64,60 @@ class ProductProvider with ChangeNotifier {
     return prov.categories[idx].id;
   }
 
-  void _subscribeToCategory(String categoryId) {
-    if (_currentCategoryId == categoryId && _sub != null) return;
+  void _fetchInitialForCategory(String categoryId) async {
     _currentCategoryId = categoryId;
-    _sub?.cancel();
     isLoading = true;
     notifyListeners();
 
-    if (categoryId.isEmpty || categoryId == 'all') {
-      debugPrint('ProductProvider: subscribing to all products');
-      _sub = _repo.getProducts().listen(
-        (list) {
-          products = list;
-          isLoading = false;
-          debugPrint(
-            'ProductProvider: received ${products.length} products (all)',
+    try {
+      QuerySnapshot<Map<String, dynamic>> snap;
+      if (_searchQuery.trim().isNotEmpty) {
+        if (categoryId.isEmpty || categoryId == 'all') {
+          snap = await _repo.searchProductsPage(
+            query: _searchQuery,
+            limit: pageSize,
           );
-          notifyListeners();
-        },
-        onError: (e) {
-          isLoading = false;
-          debugPrint('ProductProvider: error subscribing to all products: $e');
-          notifyListeners();
-        },
-      );
-    } else {
-      debugPrint('ProductProvider: subscribing to category $categoryId');
-      _sub = _repo
-          .getProductsByCategory(categoryId)
-          .listen(
-            (list) {
-              products = list;
-              isLoading = false;
-              debugPrint(
-                'ProductProvider: received ${products.length} products for category $categoryId',
-              );
-              notifyListeners();
-            },
-            onError: (e) {
-              isLoading = false;
-              debugPrint(
-                'ProductProvider: error subscribing to category $categoryId: $e',
-              );
-              notifyListeners();
-            },
+        } else {
+          snap = await _repo.searchProductsByCategoryPage(
+            query: _searchQuery,
+            categoryId: categoryId,
+            limit: pageSize,
           );
+        }
+      } else {
+        if (categoryId.isEmpty || categoryId == 'all') {
+          snap = await _repo.fetchProductsPage(limit: pageSize);
+        } else {
+          snap = await _repo.fetchProductsByCategoryPage(
+            categoryId: categoryId,
+            limit: pageSize,
+          );
+        }
+      }
+
+      products = snap.docs
+          .map((d) => ProductModel.fromMap(d.data(), d.id))
+          .toList();
+      _lastDoc = snap.docs.isNotEmpty ? snap.docs.last : null;
+      hasMore = snap.docs.length == pageSize;
+      isLoading = false;
+      notifyListeners();
+    } catch (e, st) {
+      debugPrint('ProductProvider: fetchInitial error: $e\n$st');
+      products = [];
+      isLoading = false;
+      hasMore = false;
+      notifyListeners();
     }
   }
 
   void search(String query) {
-    _sub?.cancel();
-    _searchQuery = query;
-
-    final catId = _currentCategoryId;
-    if (query.trim().isEmpty) {
-      _subscribeToCategory(catId);
-      return;
-    }
-
-    isLoading = true;
-    notifyListeners();
-
-    if (catId.isEmpty || catId == 'all') {
-      _sub = _repo
-          .searchProducts(query)
-          .listen(
-            (list) {
-              products = list;
-              isLoading = false;
-              notifyListeners();
-            },
-            onError: (e) {
-              isLoading = false;
-              debugPrint('ProductProvider: search error: $e');
-              notifyListeners();
-            },
-          );
+    _searchQuery = query.trim();
+    _resetPagination();
+    if (_searchQuery.isEmpty) {
+      _fetchInitialForCategory(_currentCategoryId);
     } else {
-      _sub = _repo
-          .searchByCategory(query, catId)
-          .listen(
-            (list) {
-              products = list;
-              isLoading = false;
-              notifyListeners();
-            },
-            onError: (e) {
-              isLoading = false;
-              debugPrint('ProductProvider: category search error: $e');
-              notifyListeners();
-            },
-          );
+      _fetchInitialForCategory(_currentCategoryId);
     }
   }
 
@@ -157,10 +126,72 @@ class ProductProvider with ChangeNotifier {
   void setCategory(String categoryId) {
     if (_searchQuery.trim().isNotEmpty) {
       _currentCategoryId = categoryId;
+      _resetPagination();
       search(_searchQuery);
     } else {
-      _subscribeToCategory(categoryId);
+      _resetPagination();
+      _fetchInitialForCategory(categoryId);
     }
+  }
+
+  void _resetPagination() {
+    _lastDoc = null;
+    hasMore = true;
+    isFetchingMore = false;
+    products = [];
+  }
+
+  Future<void> loadMore() async {
+    if (!hasMore || isFetchingMore) return;
+    isFetchingMore = true;
+    notifyListeners();
+
+    try {
+      QuerySnapshot<Map<String, dynamic>> snap;
+      final catId = _currentCategoryId;
+      if (_searchQuery.isNotEmpty) {
+        if (catId.isEmpty || catId == 'all') {
+          snap = await _repo.searchProductsPage(
+            query: _searchQuery,
+            limit: pageSize,
+            startAfter: _lastDoc,
+          );
+        } else {
+          snap = await _repo.searchProductsByCategoryPage(
+            query: _searchQuery,
+            categoryId: catId,
+            limit: pageSize,
+            startAfter: _lastDoc,
+          );
+        }
+      } else {
+        if (catId.isEmpty || catId == 'all') {
+          snap = await _repo.fetchProductsPage(
+            limit: pageSize,
+            startAfter: _lastDoc,
+          );
+        } else {
+          snap = await _repo.fetchProductsByCategoryPage(
+            categoryId: catId,
+            limit: pageSize,
+            startAfter: _lastDoc,
+          );
+        }
+      }
+
+      final fetched = snap.docs
+          .map((d) => ProductModel.fromMap(d.data(), d.id))
+          .toList();
+      products.addAll(fetched);
+      _lastDoc = snap.docs.isNotEmpty ? snap.docs.last : _lastDoc;
+      hasMore = fetched.length == pageSize;
+    } catch (e, st) {
+      debugPrint('ProductProvider: loadMore error: $e\n$st');
+      hasMore = false;
+    }
+
+    isFetchingMore = false;
+    notifyListeners();
   }
 
   List<ProductModel> productsByCategory(String categoryId) {
@@ -170,8 +201,7 @@ class ProductProvider with ChangeNotifier {
 
   @override
   void dispose() {
-    _sub?.cancel();
+    // no subscriptions to cancel (pagination-based fetching)
     super.dispose();
   }
-
 }

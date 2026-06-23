@@ -12,6 +12,7 @@ import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
 import 'package:e_com_user/general/core/injection/injection_config.dart';
 import 'package:e_com_user/general/services/local_storage/app_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class PaymentStatusScreen extends StatefulWidget {
   final String paymentMethod;
@@ -94,12 +95,27 @@ class _PaymentStatusScreenState extends State<PaymentStatusScreen> {
     }).toList();
 
     final storedUserId = getIt<AppPreferences>().getUserId();
+    final firebasePhone = FirebaseAuth.instance.currentUser?.phoneNumber;
+    if ((storedUserId == null || storedUserId.isEmpty) &&
+        (firebasePhone == null || firebasePhone.isEmpty)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Unable to determine logged-in user. Please login again.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    final userIdToUse = (storedUserId != null && storedUserId.isNotEmpty)
+        ? storedUserId
+        : firebasePhone!;
+
     final order = OrderModel(
       orderId: "",
       orderNumber: "",
-      userId: storedUserId != null && storedUserId.isNotEmpty
-          ? storedUserId
-          : '9072027963',
+      userId: userIdToUse,
       userName: selectedAddress.name,
       userPhone: selectedAddress.phone,
       date: DateTime.now(),

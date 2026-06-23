@@ -3,7 +3,6 @@ import 'package:e_com_user/features/orderAndReturn/data/model/return_details_mod
 
 abstract class OrderRepository {
   Future<void> placeOrder({required OrderModel model});
-  Future<OrderModel> getOrderById({required String orderId});
   Future<List<OrderModel>> getOrders();
   Stream<List<OrderModel>> streamOrders();
   Future<void> placeReturnRequest({

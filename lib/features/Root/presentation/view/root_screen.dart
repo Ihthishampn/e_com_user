@@ -7,6 +7,9 @@ import 'package:e_com_user/general/utils/themes/app_colors.dart';
 import 'package:e_com_user/features/Cart/presentation/provider/cart_provider.dart';
 import 'package:e_com_user/features/favourite/presentation/provider/fav_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:e_com_user/general/core/injection/injection_config.dart';
+import 'package:e_com_user/general/services/local_storage/app_preferences.dart';
+import 'package:e_com_user/features/orderAndReturn/presentation/provider/order_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
@@ -26,6 +29,12 @@ class _RootScreenState extends State<RootScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<CartProvider>().handleFetchCart();
       context.read<FavProvider>().handleFetchFavs();
+      // Load orders for the logged-in user (if available) and start listening
+      final storedUserId = getIt<AppPreferences>().getUserId();
+      if (storedUserId != null && storedUserId.isNotEmpty) {
+        context.read<OrderProvider>().loadUserOrders(userId: storedUserId);
+        context.read<OrderProvider>().startOrdersListener();
+      }
     });
   }
 
@@ -53,7 +62,7 @@ class _RootScreenState extends State<RootScreen> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(30),
-                  boxShadow: [ 
+                  boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: .08),
                       blurRadius: 20,

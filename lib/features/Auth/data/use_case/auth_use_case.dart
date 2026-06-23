@@ -8,14 +8,16 @@ class AuthUseCase {
 
   AuthUseCase(this.repo);
 
-  /// Sends OTP and returns the reqId needed for verification.
   Future<String> sendOtpUse(String phone) {
     return repo.sendOtp(phone: phone);
   }
 
-  /// Verifies OTP using the reqId returned by sendOtpUse.
-  Future<void> verifyOtpUse({required String reqId, required String otp}) {
-    return repo.verifyOtp(reqId: reqId, otp: otp);
+  Future<void> verifyOtpUse({
+    required String phone,
+    required String reqId,
+    required String otp,
+  }) {
+    return repo.verifyOtp(phone: phone, reqId: reqId, otp: otp);
   }
 
   Future<void> retryOtpUse({required String reqId}) {

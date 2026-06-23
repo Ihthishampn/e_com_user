@@ -17,11 +17,10 @@ class AuthProvider with ChangeNotifier {
 
   String? error;
 
-  /// Stored after sendOtp succeeds — used by verifyOtp.
   String? _reqId;
+  String? _phone;
 
-  /// Sends OTP to [phone] and stores the reqId for later verification.
-  /// Returns true on success.
+ 
   Future<bool> handleSendOtp(String phone) async {
     isLoading = true;
     error = null;
@@ -30,6 +29,7 @@ class AuthProvider with ChangeNotifier {
     try {
       final reqId = await useCase.sendOtpUse(phone);
       _reqId = reqId;
+      _phone = phone;
       log("OTP SENT => reqId: $reqId");
 
       isLoading = false;
@@ -42,9 +42,6 @@ class AuthProvider with ChangeNotifier {
       return false;
     }
   }
-
-  /// Verifies the OTP using the reqId stored from [handleSendOtp].
-  /// Returns true on success, false on failure.
   Future<bool> verifyOtp(String otp) async {
     if (_reqId == null) {
       error = "Session expired. Please request OTP again.";
@@ -57,7 +54,7 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      await useCase.verifyOtpUse(reqId: _reqId!, otp: otp);
+      await useCase.verifyOtpUse(phone: _phone ?? '', reqId: _reqId!, otp: otp);
       log("OTP VERIFIED");
 
       isVerifying = false;
@@ -71,7 +68,6 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  /// Retries OTP delivery using the stored reqId.
   Future<void> retryOtp() async {
     if (_reqId == null) return;
     try {
@@ -82,7 +78,6 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  /// Creates the user in Firestore and marks as logged in.
   Future<void> handleCreateUser({
     required String phone,
     required String name,
@@ -93,7 +88,6 @@ class AuthProvider with ChangeNotifier {
       log("User saved to Firestore: $phone");
       try {
         await prefs.setLoggedIn(true);
-        // store the user id/phone locally so other flows can access it
         try {
           await prefs.setUserId(phone);
         } catch (_) {}
